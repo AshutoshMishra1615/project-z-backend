@@ -4,7 +4,7 @@
 *.dll
 *.so
 *.dylib
-*.md
+
 # Test binaries
 *.test
 
@@ -39,8 +39,6 @@ Thumbs.db
 .env
 .env.local
 .env.*
-*.yaml.local
-*.json.local
 
 # Docker related
 .docker/
@@ -55,7 +53,21 @@ __pycache__/
 *.seed
 *.coverprofile
 
-# Node-related (if you have frontend in same repo)
-node_modules/
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
 
 temp/
+
+# ─── Agent / AI-generated docs (keep README.md) ──────────
+ARCHITECTURE.md
+CHANGES_SUMMARY.md
+CLAUDE.md
+AGENTS.md
+INTEGRATION_GUIDE.md
+PROJECT_DOCUMENTATION.md
+
+# Catch-all for any other generated markdown (but keep README)
+# If you add new hand-written .md files, list them here with a ! prefix
+# e.g.: !CONTRIBUTING.md

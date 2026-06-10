@@ -34,7 +34,7 @@ func GetProblems() ([]models.Problem, error) {
 		}
 
 		// Fetch test cases for this problem
-		testCases, err := getTestCasesByProblemID(p.ID)
+		testCases, err := GetTestCasesByProblemID(p.ID)
 		if err != nil {
 			log.Printf("Error fetching test cases for problem %d: %v\n", p.ID, err)
 		}
@@ -83,7 +83,7 @@ func GetProblemByID(problemID int64) (*models.Problem, error) {
 	}
 
 	// Fetch test cases for this problem
-	testCases, err := getTestCasesByProblemID(problemID)
+	testCases, err := GetTestCasesByProblemID(problemID)
 	if err != nil {
 		log.Printf("Error fetching test cases for problem %d: %v\n", problemID, err)
 	}
@@ -128,8 +128,8 @@ func CreateProblem(p models.Problem) (models.Problem, error) {
 }
 
 // Helper function to fetch test cases for a problem
-func getTestCasesByProblemID(problemID int64) ([]models.TestCase, error) {
-	log.Printf("getTestCasesByProblemID service called with problem ID: %d\n", problemID)
+func GetTestCasesByProblemID(problemID int64) ([]models.TestCase, error) {
+	log.Printf("GetTestCasesByProblemID service called with problem ID: %d\n", problemID)
 
 	rows, err := database.DB.Query(
 		`SELECT id, problem_id, input, expected_output, is_sample, created_at 
@@ -216,7 +216,7 @@ func CreateSubmission(submission models.Submission) (models.Submission, error) {
 	log.Println("CreateSubmission service called")
 
 	// Validate required fields
-	if submission.UserID == 0 || submission.ProblemID == 0 || submission.Language == "" || submission.SourceCode == "" {
+	if submission.UserID == 0 || submission.ProblemID == 0 || submission.Language == "" || submission.Code == "" {
 		return models.Submission{}, errors.New("user_id, problem_id, language, and source_code are required")
 	}
 
@@ -225,15 +225,15 @@ func CreateSubmission(submission models.Submission) (models.Submission, error) {
 		`INSERT INTO submissions (user_id, problem_id, language, source_code, status, submitted_at)
 		 VALUES ($1, $2, $3, $4, $5, $6)
 		 RETURNING id, submitted_at`,
-		submission.UserID, submission.ProblemID, submission.Language, submission.SourceCode, "Queued", time.Now(),
-	).Scan(&submission.ID, &submission.SubmittedAt)
+		submission.UserID, submission.ProblemID, submission.Language, submission.Code, "Queued", time.Now(),
+	).Scan(&submission.ID, &submission.CreatedAt)
 
 	if err != nil {
 		log.Printf("DB insert error: %v\n", err)
 		return models.Submission{}, err
 	}
 
-	submission.Status = "Queued"
+	submission.State = "Queued"
 	return submission, nil
 }
 
@@ -266,7 +266,7 @@ func GetSubmissionByID(submissionID int64) (*models.Submission, error) {
 		 FROM submissions 
 		 WHERE id = $1`,
 		submissionID,
-	).Scan(&s.ID, &s.UserID, &s.ProblemID, &s.Language, &s.SourceCode, &s.Status, &s.ResultMessage, &s.ExecutionTime, &s.MemoryUsed, &s.SubmittedAt)
+	).Scan(&s.ID, &s.UserID, &s.ProblemID, &s.Language, &s.Code, &s.State, &s.Logs, &s.ExecutionTime, &s.MemoryUsage, &s.CreatedAt)
 
 	if err != nil {
 		if err == sql.ErrNoRows {

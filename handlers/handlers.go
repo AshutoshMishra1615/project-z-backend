@@ -10,11 +10,13 @@ func HandleError(c *gin.Context, statusCode int, errorMsg string) {
 		msg = "Internal Server Error"
 	}
 	c.JSON(statusCode, gin.H{"error": msg})
-
 }
 
 func HandleSuccess(c *gin.Context, statusCode int, responseData interface{}) {
-	c.JSON(statusCode, responseData)
+	c.JSON(statusCode, gin.H{
+		"data":    responseData,
+		"message": "success",
+	})
 }
 
 // HealthHandler returns a simple health status

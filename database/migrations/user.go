@@ -16,10 +16,10 @@ func UsersMigration() {
 		log.Fatal("Failed to read users.sql file:", err)
 	}
 
-	database.DB.Exec(string(bytefile))
-	if err != nil {
-		log.Fatal("Failed to create users table:", err)
+	_, execErr := database.DB.Exec(string(bytefile))
+	if execErr != nil {
+		log.Fatal("Failed to create users table:", execErr)
 	}
 
-	log.Println("Database migrations ran successfully")
+	log.Println("Users migration ran successfully")
 }

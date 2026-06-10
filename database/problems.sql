@@ -1,4 +1,4 @@
-CREATE TABLE problems (
+CREATE TABLE IF NOT EXISTS problems (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE problems (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE test_cases (
+CREATE TABLE IF NOT EXISTS test_cases (
     id BIGSERIAL PRIMARY KEY,
     problem_id BIGINT NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
     input TEXT NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE test_cases (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE submissions (
+CREATE TABLE IF NOT EXISTS submissions (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     problem_id BIGINT NOT NULL REFERENCES problems(id) ON DELETE CASCADE,

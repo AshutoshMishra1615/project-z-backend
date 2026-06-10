@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -15,7 +14,7 @@ import (
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		cfg := config.LoadConfig()
+		cfg := config.GetConfig()
 
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
@@ -31,7 +30,6 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		fmt.Println(tokenString)
 		secret := cfg.JWT_SECRET
 		if len(secret) == 0 {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "JWT secret not set"})
@@ -77,15 +75,34 @@ func AuthMiddleware() gin.HandlerFunc {
 			userID = 0
 		}
 
+		role := "user"
+		if r, ok := claims["role"].(string); ok {
+			role = r
+		}
+
 		c.Set("user_id", userID)
 		c.Set("email", claims["email"])
+		c.Set("role", role)
 
 		c.Next()
 	}
 }
 
-func CreateJWT(userID int64, email string) (string, error) {
-	cfg := config.LoadConfig()
+// AdminMiddleware ensures only admin users can access the route
+func AdminMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, exists := c.Get("role")
+		if !exists || role != "admin" {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Admin access required"})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
+}
+
+func CreateJWT(userID int64, email string, role string) (string, error) {
+	cfg := config.GetConfig()
 	secret := cfg.JWT_SECRET
 
 	if secret == "" {
@@ -95,6 +112,7 @@ func CreateJWT(userID int64, email string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userID,
 		"email":   email,
+		"role":    role,
 		"exp":     time.Now().Add(time.Hour * 24 * 5).Unix(),
 	})
 

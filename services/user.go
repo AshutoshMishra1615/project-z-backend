@@ -25,26 +25,32 @@ func Register(u models.User) (models.User, error) {
 		return models.User{}, err
 	}
 
+	role := "user"
+	if u.Role == "admin" {
+		role = "admin"
+	}
+
 	err = database.DB.QueryRow(
-		`INSERT INTO users (username, email, password_hash, created_at)
-		VALUES ($1, $2, $3, $4)
-		RETURNING id, username, email, created_at`,
-		u.Name, u.Email, string(hashedPassword), time.Now(),
-	).Scan(&u.ID, &u.Name, &u.Email, &u.CreatedAt)
+		`INSERT INTO users (username, email, password_hash, role, created_at)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id, username, email, role, created_at`,
+		u.Name, u.Email, string(hashedPassword), role, time.Now(),
+	).Scan(&u.ID, &u.Name, &u.Email, &u.Role, &u.CreatedAt)
 
 	if err != nil {
 		return models.User{}, err
 	}
 
+	u.Password = ""
 	return u, nil
 }
 
 func UserInfo(userID int64) (models.User, error) {
 	var u models.User
 	err := database.DB.QueryRow(
-		`SELECT id, username, email, created_at FROM users WHERE id = $1`,
+		`SELECT id, username, email, role, created_at FROM users WHERE id = $1`,
 		userID,
-	).Scan(&u.ID, &u.Name, &u.Email, &u.CreatedAt)
+	).Scan(&u.ID, &u.Name, &u.Email, &u.Role, &u.CreatedAt)
 	if err != nil {
 		return models.User{}, err
 	}
@@ -54,9 +60,9 @@ func UserInfo(userID int64) (models.User, error) {
 func Login(u models.User) (string, error) {
 	var passwordHash string
 	err := database.DB.QueryRow(
-		`SELECT id, username, email, password_hash FROM users WHERE username = $1`,
+		`SELECT id, username, email, password_hash, role FROM users WHERE username = $1`,
 		u.Name,
-	).Scan(&u.ID, &u.Name, &u.Email, &passwordHash)
+	).Scan(&u.ID, &u.Name, &u.Email, &passwordHash, &u.Role)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -69,7 +75,7 @@ func Login(u models.User) (string, error) {
 		return "", errors.New("Invalid username or password")
 	}
 
-	tokenString, err := middleware.CreateJWT(u.ID, u.Email)
+	tokenString, err := middleware.CreateJWT(u.ID, u.Email, u.Role)
 	if err != nil {
 		return "", err
 	}
@@ -83,9 +89,9 @@ func GetUserWithStats(userID int64) (*models.User, error) {
 
 	var u models.User
 	err := database.DB.QueryRow(
-		`SELECT id, username, email, created_at FROM users WHERE id = $1`,
+		`SELECT id, username, email, role, created_at FROM users WHERE id = $1`,
 		userID,
-	).Scan(&u.ID, &u.Name, &u.Email, &u.CreatedAt)
+	).Scan(&u.ID, &u.Name, &u.Email, &u.Role, &u.CreatedAt)
 
 	if err != nil {
 		log.Printf("Error fetching user: %v\n", err)
@@ -151,7 +157,7 @@ func GetUserSubmissions(userID int64) ([]models.Submission, error) {
 
 	for rows.Next() {
 		var s models.Submission
-		err := rows.Scan(&s.ID, &s.UserID, &s.ProblemID, &s.Language, &s.SourceCode, &s.Status, &s.ResultMessage, &s.ExecutionTime, &s.MemoryUsed, &s.SubmittedAt)
+		err := rows.Scan(&s.ID, &s.UserID, &s.ProblemID, &s.Language, &s.Code, &s.State, &s.Logs, &s.ExecutionTime, &s.MemoryUsage, &s.CreatedAt)
 		if err != nil {
 			log.Printf("Row scan error: %v\n", err)
 			return nil, err

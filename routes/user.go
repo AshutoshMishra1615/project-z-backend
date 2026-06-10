@@ -8,9 +8,16 @@ import (
 )
 
 func setupUserRoutes(api *gin.RouterGroup) {
-
+	// Public auth routes
 	api.POST("/user/register", controllers.Register)
 	api.POST("/user/login", controllers.Login)
-	api.GET("/user/me", middleware.AuthMiddleware(), controllers.Me)
 
+	// Authenticated user routes
+	userAuth := api.Group("/user")
+	userAuth.Use(middleware.AuthMiddleware())
+	{
+		userAuth.GET("/me", controllers.Me)
+		userAuth.GET("/stats", controllers.GetUserStats)
+		userAuth.GET("/submissions", controllers.GetUserSubmissions)
+	}
 }
