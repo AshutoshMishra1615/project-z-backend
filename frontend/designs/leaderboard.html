@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Leaderboard | Project Z</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Theme Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#ffd1c6",
+                    "error-container": "#93000a",
+                    "background": "#0d0d0d",
+                    "on-tertiary": "#611200",
+                    "primary-container": "#00f2ff",
+                    "on-tertiary-fixed-variant": "#891d00",
+                    "secondary": "#d7ffc5",
+                    "outline": "#849495",
+                    "surface-bright": "#3a3939",
+                    "on-surface-variant": "#b9cacb",
+                    "tertiary-fixed": "#ffdad2",
+                    "surface-dim": "#131313",
+                    "on-primary": "#00363a",
+                    "inverse-primary": "#00696f",
+                    "on-primary-container": "#006a71",
+                    "surface-container-high": "#2a2a2a",
+                    "surface-tint": "#00dbe7",
+                    "on-surface": "#e5e2e1",
+                    "surface": "#131313",
+                    "error": "#ffb4ab",
+                    "inverse-surface": "#e5e2e1",
+                    "on-background": "#e5e2e1",
+                    "secondary-container": "#2ff801",
+                    "surface-variant": "#353534",
+                    "on-error": "#690005",
+                    "on-secondary-fixed-variant": "#095300",
+                    "tertiary": "#fff6f4",
+                    "on-secondary-container": "#0f6d00",
+                    "on-primary-fixed-variant": "#004f54",
+                    "primary": "#e1fdff",
+                    "on-primary-fixed": "#002022",
+                    "secondary-fixed-dim": "#2ae500",
+                    "outline-variant": "#3a494b",
+                    "on-secondary": "#053900",
+                    "tertiary-fixed-dim": "#ffb4a2",
+                    "secondary-fixed": "#79ff5b",
+                    "surface-container-highest": "#353534",
+                    "primary-fixed": "#74f5ff",
+                    "on-tertiary-container": "#b62a00",
+                    "surface-container": "#201f1f",
+                    "inverse-on-surface": "#313030",
+                    "on-tertiary-fixed": "#3c0700",
+                    "on-secondary-fixed": "#022100",
+                    "surface-container-lowest": "#0e0e0e",
+                    "primary-fixed-dim": "#00dbe7",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-low": "#1c1b1b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "max-width": "1440px",
+                    "unit": "4px",
+                    "margin-desktop": "32px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "terminal-sm": ["JetBrains Mono"],
+                    "headline-md": ["Inter"],
+                    "code-block": ["JetBrains Mono"],
+                    "label-caps": ["JetBrains Mono"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "terminal-sm": ["12px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "code-block": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-caps": ["11px", {"lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { background-color: #0d0d0d; color: #e5e2e1; }
+        .glow-gold { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.3)); border-color: #FFD700; }
+        .glow-silver { filter: drop-shadow(0 0 15px rgba(192, 192, 192, 0.3)); border-color: #C0C0C0; }
+        .glow-bronze { filter: drop-shadow(0 0 15px rgba(205, 127, 50, 0.3)); border-color: #CD7F32; }
+        .terminal-scroll::-webkit-scrollbar { width: 4px; }
+        .terminal-scroll::-webkit-scrollbar-track { background: #0d0d0d; }
+        .terminal-scroll::-webkit-scrollbar-thumb { background: #3a494b; border-radius: 2px; }
+        .terminal-scroll::-webkit-scrollbar-thumb:hover { background: #00f2ff; }
+        @keyframes countUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .count-up { animation: countUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-hidden">
+<!-- TopNavBar Implementation -->
+<header class="bg-background dark:bg-background border-b border-outline-variant fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-16 max-w-max-width mx-auto left-0 right-0">
+<div class="flex items-center gap-8">
+<span class="font-label-caps text-label-caps text-primary-container dark:text-primary-container">PROJECT Z</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Problems</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200" href="#">Dashboard</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant">search</span>
+<input class="bg-surface-container-low border border-outline-variant rounded-lg pl-10 pr-4 py-1 text-terminal-sm font-terminal-sm focus:border-primary-container focus:ring-0 w-64" placeholder="Search problems..." type="text"/>
+</div>
+<button class="text-on-surface-variant font-medium hover:text-primary transition-all active:scale-95">Login</button>
+<button class="bg-primary-container text-on-primary-container px-4 py-2 rounded font-bold text-body-md active:scale-95 transition-transform">Register</button>
+</div>
+</header>
+<div class="flex h-screen pt-16">
+<!-- SideNavBar Implementation -->
+<aside class="bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant h-full w-64 flex flex-col py-6 fixed left-0">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-8 h-8 rounded-full bg-primary-container/20 flex items-center justify-center border border-primary-container/30 overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBu7mCkUDjT05Lo_B3R8SGdAkTVx2Z3DIPD2jml9JKoivcpMGT8bElTkrf7E2xO0NtB37reu5ncfx53L9lsbfgh1I4OXzsc2kKKF9xfbtA4d5NZIblRKlYjReWa_F8p4bJPgOLeab-dkRi-MAvoFzkTJ6-AKcbyuhcvoJZW0Zjgdv8B1eL-ZHcUlnRip9Wyh5moj--vR4rCkJiHIqsVivW9rNM37bN0amR1o-nzwJH8cCO4DZpQrP31cj9glZOsHXeWPIhIIHNNn28"/>
+</div>
+<div>
+<div class="font-label-caps text-label-caps text-primary">PROJECT Z</div>
+<div class="font-terminal-sm text-terminal-sm text-on-surface-variant opacity-60">Terminal v1.0.4</div>
+</div>
+</div>
+</div>
+<nav class="flex-1">
+<ul class="space-y-1">
+<li class="px-4">
+<a class="flex items-center gap-3 px-4 py-2 rounded text-on-surface-variant hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined">code</span>
+<span class="font-terminal-sm text-terminal-sm">Problem Set</span>
+</a>
+</li>
+<li class="px-4">
+<a class="flex items-center gap-3 px-4 py-2 rounded text-on-surface-variant hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined">event</span>
+<span class="font-terminal-sm text-terminal-sm">Contests</span>
+</a>
+</li>
+<li class="px-4">
+<a class="flex items-center gap-3 px-4 py-2 rounded bg-primary-container/10 text-primary-container border-r-2 border-primary-container" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-terminal-sm text-terminal-sm">Leaderboard</span>
+</a>
+</li>
+<li class="px-4">
+<a class="flex items-center gap-3 px-4 py-2 rounded text-on-surface-variant hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-terminal-sm text-terminal-sm">Settings</span>
+</a>
+</li>
+</ul>
+</nav>
+<div class="mt-auto px-4 space-y-1 border-t border-outline-variant/30 pt-4">
+<a class="flex items-center gap-3 px-4 py-2 rounded text-on-surface-variant hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-terminal-sm text-terminal-sm">Docs</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 rounded text-on-surface-variant hover:bg-surface-container-highest transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-terminal-sm text-terminal-sm">Help</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 overflow-y-auto terminal-scroll bg-background">
+<div class="max-w-6xl mx-auto px-margin-desktop py-8">
+<!-- Header & Filters -->
+<div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-12">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary-fixed mb-4">LEADERBOARD</h1>
+<div class="flex bg-surface-container rounded p-1 border border-outline-variant/50">
+<button class="px-6 py-1.5 rounded-sm bg-primary-container text-on-primary-container font-terminal-sm text-terminal-sm">Global</button>
+<button class="px-6 py-1.5 rounded-sm text-on-surface-variant font-terminal-sm text-terminal-sm hover:text-primary transition-colors">Contest</button>
+<button class="px-6 py-1.5 rounded-sm text-on-surface-variant font-terminal-sm text-terminal-sm hover:text-primary transition-colors">Friends</button>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-1 rounded-full border border-primary-container/40 text-primary-container bg-primary-container/5 font-terminal-sm text-terminal-sm">All Time</button>
+<button class="px-4 py-1 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary-container/40 transition-colors font-terminal-sm text-terminal-sm">This Month</button>
+<button class="px-4 py-1 rounded-full border border-outline-variant text-on-surface-variant hover:border-primary-container/40 transition-colors font-terminal-sm text-terminal-sm">This Week</button>
+</div>
+</div>
+<!-- Podium Section -->
+<div class="grid grid-cols-1 md:grid-cols-3 items-end gap-6 mb-16 px-4">
+<!-- Rank 2 -->
+<div class="order-2 md:order-1 flex flex-col items-center">
+<div class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-6 flex flex-col items-center glow-silver relative group transition-all hover:scale-105">
+<div class="absolute -top-6 bg-surface-container border border-outline-variant px-3 py-1 rounded font-terminal-sm text-terminal-sm text-on-surface-variant">RANK 2</div>
+<div class="w-20 h-20 rounded-full border-2 border-outline-variant mb-4 overflow-hidden p-1">
+<img class="w-full h-full rounded-full object-cover" data-alt="A pixelated avatar of a character with digital-style features and silver accents, set against a dark, minimalist background suitable for a high-end competitive coding platform. The lighting is focused and cybernetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwVE4GjtH0gsZUkCBJ5gNjVxw7z4HZFIiJgBxIPlVfbNYlcbcglQdnpOYpsnEn1nlAh96P5xJNbUBCT1J82ZcoBnYjpaGwfZfHgagnp3Jzt4F8m4zD-LERM9J9HPj_AL5Q0AvSzZ7YleJPVWdUYuPBBwCmMdRAEOP3LY-mJtLshXd2v8YqM0KWXhNAHhVoFKSDhlhhxIYWCfLrmEwhsGj3WnsQHnvc7xYeJfpJXLiY9kuX0q6gEmXJvyjzCiDDhCroyb9eYZy_esc"/>
+</div>
+<span class="material-symbols-outlined text-outline mb-2">military_tech</span>
+<div class="font-headline-md text-headline-md text-primary-fixed mb-1">byte_me</div>
+<div class="font-terminal-sm text-terminal-sm text-primary-container font-bold">2715 PTS</div>
+</div>
+</div>
+<!-- Rank 1 -->
+<div class="order-1 md:order-2 flex flex-col items-center">
+<div class="w-full bg-surface-container-low border-2 border-primary-container rounded-lg p-8 flex flex-col items-center glow-gold relative z-10 scale-110 transition-all hover:scale-[1.12]">
+<div class="absolute -top-6 bg-primary-container text-on-primary-container px-4 py-1 rounded font-bold font-terminal-sm text-terminal-sm shadow-[0_0_20px_rgba(0,242,255,0.4)]">CHAMPION</div>
+<div class="w-24 h-24 rounded-full border-4 border-primary-container mb-4 overflow-hidden p-1 shadow-[0_0_15px_rgba(0,242,255,0.2)]">
+<img class="w-full h-full rounded-full object-cover" data-alt="A sophisticated pixel art avatar representing an elite developer with gold and cyan technological enhancements. The portrait is framed in a glowing cyan circle, conveying a sense of mastery and digital prestige in a deep dark environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWsZ2h89VR9OSpSGoqRg_NWCLoe3-KNFX_OCFDssw4CafGHMgb4oxBOVo2kaQR6gnx3dcQcUa-jo0Frd0Nljxa2fMq4ZRAl1uDVMlgRRT2Aqz8hRflNHUYUwU9iiS7IS7h5t3w0LuJFPmUEqPb43cm3Yjlez2OINwQaDc1v2H_G4vZuq0tuvsrPkcIOIo0HKknigJDH3xUwQ4ddgUJXns-CPnM7Z_OdsG4rnwFsRFO1j-FSmK6k4G-GL1ed3XB15-W05Et9ZnWThY"/>
+</div>
+<span class="material-symbols-outlined text-[#FFD700] mb-2 scale-150" style="font-variation-settings: 'FILL' 1;">crown</span>
+<div class="font-headline-lg text-headline-lg text-primary-fixed mb-1">null_ptr</div>
+<div class="font-terminal-sm text-headline-md text-primary-container font-bold tracking-widest">2840 PTS</div>
+</div>
+</div>
+<!-- Rank 3 -->
+<div class="order-3 flex flex-col items-center">
+<div class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-6 flex flex-col items-center glow-bronze relative group transition-all hover:scale-105">
+<div class="absolute -top-6 bg-surface-container border border-outline-variant px-3 py-1 rounded font-terminal-sm text-terminal-sm text-on-surface-variant">RANK 3</div>
+<div class="w-20 h-20 rounded-full border-2 border-outline-variant mb-4 overflow-hidden p-1">
+<img class="w-full h-full rounded-full object-cover" data-alt="A pixelated character avatar with bronze-colored cybernetic parts and a tech-focused aesthetic. The background is a clean, dark slate color with subtle luminescence, fitting the elite developer tool visual theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiuD6kb0m030LiMOt5MNeTQzwZectRxEL3fVx0-AMQ7Qb688UJAsa4FAlgZP5LOVJVuwP_XvFtL5_OLc8jN7HigVfRFwNXzcQ92dk7MNRN60lgTehOI6e8LSJ4x3CFjfHgZ2LJ-UCfnHnTz7OuHc1U2kEBTubMItZm3krS_9zKwgtnkAVmROR1xooZo5UWuIj1_CHBPjhH_VlgAjUQAWJRLao1OxgzeB7aD2MynBzxLGZWtnM--lBlB0ErCpj_emuC6Egu0U4071w"/>
+</div>
+<span class="material-symbols-outlined text-[#CD7F32] mb-2">military_tech</span>
+<div class="font-headline-md text-headline-md text-primary-fixed mb-1">stack_ovfl</div>
+<div class="font-terminal-sm text-terminal-sm text-primary-container font-bold">2690 PTS</div>
+</div>
+</div>
+</div>
+<!-- Leaderboard Table -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden mb-12">
+<div class="grid grid-cols-[80px_1fr_120px_150px_120px_200px_100px] gap-4 px-6 py-4 bg-surface-container/50 border-b border-outline-variant font-label-caps text-label-caps text-on-surface-variant">
+<div>RANK</div>
+<div>CODER</div>
+<div class="text-right">SOLVED</div>
+<div class="text-right">RATING</div>
+<div class="text-right">ACCURACY</div>
+<div>BADGES</div>
+<div class="text-center">REGION</div>
+</div>
+<div class="divide-y divide-outline-variant/30 font-terminal-sm text-terminal-sm">
+<!-- Top 3 Repeat for list structure consistency -->
+<div class="grid grid-cols-[80px_1fr_120px_150px_120px_200px_100px] gap-4 px-6 py-5 items-center hover:bg-[#00f2ff08] transition-colors group">
+<div class="font-bold text-primary-container flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span> 1
+                            </div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full border border-primary-container overflow-hidden">
+<img class="w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAokSV7QP7Zm24rV5Lpk5TaOv7bMo6lTvOC1Yeinx0ddEr2b7HPIkFnb1ykfMjC0B3fY8BFDs5iZMR2BkMDgiG4-0JIM55sAbb3xDqRbkNyXWA_t7DQqk7cGoPWmA--dYSWiZ_AkL-adizRC30VwZJTtsizzD8y_Hu_A6_t42hPBN4FvqYZyiUEAe0unCjwxBs4Y264BDQAJhBSKskEa3hYmfc-y8uSzlHOUvP9JTNl3Gqa7Tnf8YLlcBY3igRY-euzEPKrMMYUdwg"/>
+</div>
+<span class="font-bold text-on-surface">null_ptr</span>
+</div>
+<div class="text-right font-code-block text-code-block">412</div>
+<div class="text-right flex items-center justify-end gap-1">
+<span class="font-code-block text-code-block">2840</span>
+<span class="material-symbols-outlined text-green-500 text-sm">arrow_upward</span>
+</div>
+<div class="text-right text-on-surface-variant">98.4%</div>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 rounded-sm border border-primary-container/30 text-[10px] text-primary-container bg-primary-container/5 uppercase">Top Gun</span>
+</div>
+<div class="text-center text-xl">🇺🇸</div>
+</div>
+<!-- Current User Row (Cyan Left Border) -->
+<div class="grid grid-cols-[80px_1fr_120px_150px_120px_200px_100px] gap-4 px-6 py-5 items-center bg-[#00f2ff10] border-l-4 border-primary-container group">
+<div class="font-bold text-primary-container">42</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full border border-primary-container overflow-hidden">
+<img class="w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCd9cx9nuQcIioW2iy15YtdEEDh_-IltR30QVmS-Ev1vq_mlYlUjhP67gQgOSRr2Ha7PrlATvNvl8W39D01d-p76GUEbrMSp2nw0hgz3cWGCKm-B-gYrJSiLL7Br5ZyS4eqXqTj4Ut2KDUIJjEVrkdwrU3jzpkxpNwDaRmtgqAA1G3ppkGokptlHwxjOq23UAaiDQvUPI1wVt6yRjFAHD-gPkpf5ztOdQ_XeeoDgK-Et5Bv3BvnknRfYrHMfjT8pkJTZTOeebUCrLM"/>
+</div>
+<span class="font-bold text-primary-container">user_42 (YOU)</span>
+</div>
+<div class="text-right font-code-block text-code-block">215</div>
+<div class="text-right flex items-center justify-end gap-1">
+<span class="font-code-block text-code-block">1840</span>
+<span class="material-symbols-outlined text-green-500 text-sm">arrow_upward</span>
+</div>
+<div class="text-right text-on-surface-variant">82.1%</div>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 rounded-sm border border-secondary-container/30 text-[10px] text-secondary-container bg-secondary-container/5 uppercase">Rising Star</span>
+</div>
+<div class="text-center text-xl">🇨🇦</div>
+</div>
+<!-- Regular Row 1 -->
+<div class="grid grid-cols-[80px_1fr_120px_150px_120px_200px_100px] gap-4 px-6 py-5 items-center hover:bg-surface-container-high transition-colors group">
+<div class="text-on-surface-variant">4</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9CvA2ywTQD1szNwHsS5LxWj7pHeyGIimeNSTLnWuatLCfobg3cEMfOjDTZVbtc6knm-RThuZk7Pg8_hbSjRNtYiZDeDhUwo0kM117pu3AlTuZLpEewiviMnp4T-u3lq66U8oiu4nHyrYSkPNjZZBu4n2y42MIvcipiXg65f3-UMJY0W3ip0j-rqXXFIDITmNhHaTidwTLlSb-ZK2JDb-tHX4QSLSsLc9bx1XxKhAV92NNnJ953Qgq_VwXL6YIMHq789a6TS2Q2co"/>
+</div>
+<span class="text-on-surface">coder_x</span>
+</div>
+<div class="text-right font-code-block text-code-block">388</div>
+<div class="text-right flex items-center justify-end gap-1">
+<span class="font-code-block text-code-block">2540</span>
+<span class="material-symbols-outlined text-red-500 text-sm">arrow_downward</span>
+</div>
+<div class="text-right text-on-surface-variant">92.0%</div>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 rounded-sm border border-outline-variant text-[10px] text-on-surface-variant bg-surface-container uppercase">Veteran</span>
+</div>
+<div class="text-center text-xl">🇩🇪</div>
+</div>
+<!-- Regular Row 2 -->
+<div class="grid grid-cols-[80px_1fr_120px_150px_120px_200px_100px] gap-4 px-6 py-5 items-center hover:bg-surface-container-high transition-colors group">
+<div class="text-on-surface-variant">5</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApX1RjLlyMT0qOGH95KAwp6-jv9ZH2p8KkWh2bzaiALTEMu85sV4fW18IddhOQAOR7o-yP2qAwRfJwD4LudVbzDvgcK0SF-FyS63TSEUfMseziHqnbMD0pvMag3VuITvfwbv07VOllTyUBffFrQ_AljLdBMvPlA7OsQ9YSWX-2YEcL-Xs8qa7LVOaqlrSfmStEtAZyG1jGyH6ALmQO2Vh_TY0uJ9sUQvRHAM0RXuYgo4SPA8jPbsDHDdIeNJ9PgiFCIvyEbmGFaUQ"/>
+</div>
+<span class="text-on-surface">void_main</span>
+</div>
+<div class="text-right font-code-block text-code-block">376</div>
+<div class="text-right flex items-center justify-end gap-1">
+<span class="font-code-block text-code-block">2495</span>
+<span class="material-symbols-outlined text-green-500 text-sm">arrow_upward</span>
+</div>
+<div class="text-right text-on-surface-variant">89.5%</div>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 rounded-sm border border-primary-container/30 text-[10px] text-primary-container bg-primary-container/5 uppercase">Speed Demon</span>
+</div>
+<div class="text-center text-xl">🇮🇳</div>
+</div>
+<!-- Row 6 -->
+<div class="grid grid-cols-[80px_1fr_120px_150px_120px_200px_100px] gap-4 px-6 py-5 items-center hover:bg-surface-container-high transition-colors group">
+<div class="text-on-surface-variant">6</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full border border-outline-variant overflow-hidden">
+<img class="w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjkmz4a16EZXwQcVEDW2whKqFOpXDfLTjEd_yPXu5yDa8qHt_rhIUaQ10CTmYYwKkHb9MekQXIVjpQhXJxnJd2OdAUYRuElX_1PH1-ALn_czBa2vw5TLcdkZT91CPCbBjcyNgPquLYRh5tIhJVIgz4ue0qHCZ5iVzX32EZ3Mn7LTsckRHH14--MzATxCgwlHt-xPe-VK7pUZtgi4-94nZctHoNgPJJn19sdWCQAEDeDZ9IQgQ7xL4dLGzduT-Nkb1I6-7GV0mXVYg"/>
+</div>
+<span class="text-on-surface">lambda_soul</span>
+</div>
+<div class="text-right font-code-block text-code-block">365</div>
+<div class="text-right flex items-center justify-end gap-1">
+<span class="font-code-block text-code-block">2410</span>
+<span class="material-symbols-outlined text-green-500 text-sm">arrow_upward</span>
+</div>
+<div class="text-right text-on-surface-variant">94.8%</div>
+<div class="flex gap-2">
+<span class="px-2 py-0.5 rounded-sm border border-tertiary-container/30 text-[10px] text-tertiary-container bg-tertiary-container/5 uppercase">Bug Hunter</span>
+</div>
+<div class="text-center text-xl">🇯🇵</div>
+</div>
+</div>
+</div>
+<!-- Footer Pagination-like -->
+<div class="flex justify-center items-center gap-4 py-8">
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant text-on-surface-variant hover:border-primary-container transition-all"><span class="material-symbols-outlined">chevron_left</span></button>
+<div class="flex gap-2 font-terminal-sm text-terminal-sm">
+<button class="w-10 h-10 flex items-center justify-center border border-primary-container text-primary-container bg-primary-container/10">1</button>
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant text-on-surface-variant hover:bg-surface-container-high transition-all">2</button>
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant text-on-surface-variant hover:bg-surface-container-high transition-all">3</button>
+<span class="w-10 h-10 flex items-center justify-center text-on-surface-variant">...</span>
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant text-on-surface-variant hover:bg-surface-container-high transition-all">50</button>
+</div>
+<button class="w-10 h-10 flex items-center justify-center border border-outline-variant text-on-surface-variant hover:border-primary-container transition-all"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+</main>
+</div>
+<!-- Count up effect simulation -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const numbers = document.querySelectorAll('.font-code-block, .font-bold');
+            numbers.forEach((el, index) => {
+                el.classList.add('count-up');
+                el.style.animationDelay = `${index * 0.02}s`;
+            });
+
+            // Micro-interaction: Hover effects on rows
+            const rows = document.querySelectorAll('.divide-y > div');
+            rows.forEach(row => {
+                row.addEventListener('mouseenter', () => {
+                   // Optional JS logic for complex hover states if needed
+                });
+            });
+        });
+    </script>
+</body></html>

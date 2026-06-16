@@ -7,197 +7,48 @@ export default function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <nav
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        background: "var(--color-surface-lowest)",
-        borderBottom: "1px solid var(--color-border)",
-        height: 56,
-        display: "flex",
-        alignItems: "center",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 1440,
-          margin: "0 auto",
-          padding: "0 32px",
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        {/* Logo */}
-        <Link
-          href="/"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            textDecoration: "none",
-          }}
-        >
-          {/* Code icon */}
-          <span
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 30,
-              height: 30,
-              borderRadius: 6,
-              background: "var(--color-primary-container)",
-              color: "#fff",
-              fontFamily: "var(--font-mono)",
-              fontSize: 13,
-              fontWeight: 700,
-              letterSpacing: "-0.05em",
-              flexShrink: 0,
-            }}
-          >
-            Z
-          </span>
-          <span
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontWeight: 700,
-              fontSize: 16,
-              color: "var(--color-text-primary)",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            Z
-          </span>
-        </Link>
-
-        {/* Center nav links */}
-        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          {[
-            { href: "/problems", label: "Problems" },
-            { href: "/dashboard", label: "Dashboard" },
-          ].map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              style={{
-                padding: "6px 14px",
-                fontSize: 14,
-                fontWeight: 500,
-                color: "var(--color-text-muted)",
-                textDecoration: "none",
-                borderRadius: "var(--radius-md)",
-                transition: "color 150ms, background 150ms",
-              }}
-              onMouseEnter={(e) => {
-                (e.target as HTMLAnchorElement).style.color =
-                  "var(--color-text-primary)";
-                (e.target as HTMLAnchorElement).style.background =
-                  "var(--color-surface-high)";
-              }}
-              onMouseLeave={(e) => {
-                (e.target as HTMLAnchorElement).style.color =
-                  "var(--color-text-muted)";
-                (e.target as HTMLAnchorElement).style.background = "transparent";
-              }}
-            >
-              {label}
-            </Link>
-          ))}
+    <header className="bg-background dark:bg-background border-b border-outline-variant w-full h-16 sticky top-0 z-50 shrink-0 flex justify-center">
+      <div className="flex justify-between items-center w-full max-w-[1440px] px-8">
+        <div className="flex items-center gap-8">
+          <Link href="/" className="font-label-caps text-label-caps text-primary-container dark:text-primary-container text-[18px] tracking-widest uppercase no-underline">
+            Project Z
+          </Link>
+          <nav className="hidden md:flex gap-6">
+            <Link href="/problems" className="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200 active:scale-95 no-underline">Problems</Link>
+            <Link href="/dashboard" className="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200 active:scale-95 no-underline">Dashboard</Link>
+          </nav>
         </div>
+        <div className="flex items-center gap-6">
+          <div className="relative hidden sm:block">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+            <input className="bg-surface-container-lowest border border-outline-variant rounded-lg pl-10 pr-4 py-1.5 text-sm focus:border-primary-container focus:outline-none transition-all w-64 text-on-surface" placeholder="Search contests..." type="text" />
+          </div>
 
-        {/* Right: auth */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {user ? (
-            <>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                {/* Avatar */}
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: "50%",
-                    background: "var(--color-primary-container)",
-                    color: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 12,
-                    fontWeight: 700,
-                    flexShrink: 0,
-                  }}
-                >
-                  {user.name.charAt(0).toUpperCase()}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary font-bold flex items-center justify-center text-sm uppercase">
+                  {user.name.charAt(0)}
                 </div>
-                <span
-                  style={{
-                    fontSize: 13,
-                    color: "var(--color-text-secondary)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                  }}
-                >
-                  {user.name}
-                  {user.role === "admin" && (
-                    <span
-                      style={{
-                        padding: "1px 6px",
-                        fontSize: 10,
-                        fontWeight: 700,
-                        textTransform: "uppercase",
-                        letterSpacing: "0.06em",
-                        borderRadius: "var(--radius-full)",
-                        background: "rgba(79, 70, 229, 0.18)",
-                        color: "var(--color-primary)",
-                        border: "1px solid rgba(79, 70, 229, 0.35)",
-                      }}
-                    >
-                      Admin
-                    </span>
-                  )}
-                </span>
+                <span className="text-sm font-medium text-on-surface-variant">{user.name}</span>
+                {user.role === "admin" && (
+                  <span className="px-2 py-0.5 rounded-full bg-primary-container/10 border border-primary-container/30 text-primary-container text-[10px] font-bold uppercase tracking-wider">
+                    Admin
+                  </span>
+                )}
               </div>
-              <button
-                onClick={logout}
-                style={{
-                  padding: "5px 12px",
-                  fontSize: 13,
-                  fontWeight: 500,
-                  color: "var(--color-text-muted)",
-                  background: "transparent",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-md)",
-                  cursor: "pointer",
-                  transition: "border-color 150ms, color 150ms",
-                }}
-                onMouseEnter={(e) => {
-                  (e.target as HTMLButtonElement).style.borderColor =
-                    "var(--color-border-hover)";
-                  (e.target as HTMLButtonElement).style.color =
-                    "var(--color-text-primary)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.target as HTMLButtonElement).style.borderColor =
-                    "var(--color-border)";
-                  (e.target as HTMLButtonElement).style.color =
-                    "var(--color-text-muted)";
-                }}
-              >
+              <button onClick={logout} className="text-on-surface-variant font-medium px-4 py-1.5 border border-outline-variant rounded-lg hover:text-primary-fixed-dim hover:border-primary-fixed-dim transition-all text-sm cursor-pointer">
                 Logout
               </button>
-            </>
+            </div>
           ) : (
-            <Link href="/auth" className="btn-primary" style={{ fontSize: 13, padding: "6px 16px" }}>
-              Sign In
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link href="/auth" className="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors text-sm no-underline">Login</Link>
+              <Link href="/auth" className="bg-primary-container text-on-primary font-bold px-5 py-2 rounded-lg active:scale-95 transition-transform text-sm no-underline">Register</Link>
+            </div>
           )}
         </div>
       </div>
-    </nav>
+    </header>
   );
 }

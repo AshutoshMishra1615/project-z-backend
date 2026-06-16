@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
+import SidebarLayout from "../components/Sidebar";
 
 interface Problem {
   id: number;
@@ -24,12 +25,12 @@ function DifficultyBadge({ difficulty }: { difficulty: string }) {
         display: "inline-flex",
         alignItems: "center",
         padding: "2px 10px",
-        borderRadius: "var(--radius-full)",
-        fontSize: 11,
-        fontWeight: 600,
+        borderRadius: "var(--radius-md)",
+        fontSize: 10,
+        fontWeight: 700,
         textTransform: "capitalize",
         fontFamily: "var(--font-mono)",
-        letterSpacing: "0.02em",
+        letterSpacing: "0.1em",
       }}
     >
       {difficulty}
@@ -37,12 +38,11 @@ function DifficultyBadge({ difficulty }: { difficulty: string }) {
   );
 }
 
-const FILTER_LABELS: { value: DifficultyFilter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "easy", label: "Easy" },
-  { value: "medium", label: "Medium" },
-  { value: "hard", label: "Hard" },
-];
+const FILTER_COLORS: Record<string, { border: string; text: string; bg: string }> = {
+  easy: { border: "#79ff5b", text: "#79ff5b", bg: "rgba(121,255,91,0.1)" },
+  medium: { border: "#00f2ff", text: "#00f2ff", bg: "rgba(0,242,255,0.1)" },
+  hard: { border: "#ffb4ab", text: "#ffb4ab", bg: "rgba(255,180,171,0.1)" },
+};
 
 export default function ProblemsPage() {
   const { API_URL } = useAuth();
@@ -78,297 +78,255 @@ export default function ProblemsPage() {
 
   if (loading) {
     return (
-      <div
-        style={{
-          minHeight: "calc(100vh - 56px)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 14,
-          color: "var(--color-text-muted)",
-        }}
-      >
-        <span className="spinner spinner-lg" />
-        <p style={{ fontSize: 14 }}>Loading problems…</p>
-      </div>
+      <SidebarLayout>
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 14,
+            color: "var(--color-text-muted)",
+          }}
+        >
+          <span className="spinner spinner-lg" />
+          <p style={{ fontSize: 14, fontFamily: "var(--font-mono)" }}>Loading problems…</p>
+        </div>
+      </SidebarLayout>
     );
   }
 
   return (
-    <div
-      style={{
-        maxWidth: 1080,
-        margin: "0 auto",
-        padding: "40px 24px 80px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 28,
-      }}
-    >
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-        <div>
-          <h1
-            style={{
-              fontSize: 26,
-              fontWeight: 700,
-              color: "var(--color-text-primary)",
-              letterSpacing: "-0.02em",
-              marginBottom: 4,
-            }}
-          >
-            Problems
-          </h1>
-          <p style={{ fontSize: 13, color: "var(--color-text-muted)", fontFamily: "var(--font-mono)" }}>
-            {problems.length} challenges across all difficulty levels
-          </p>
-        </div>
-      </div>
-
-      {/* Toolbar: filters + search */}
+    <SidebarLayout>
+      {/* Search & Filter Bar */}
       <div
         style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 12,
-          alignItems: "center",
-          justifyContent: "space-between",
+          padding: "16px 32px",
+          borderBottom: "1px solid var(--color-border)",
+          background: "var(--color-surface-low)",
+          flexShrink: 0,
         }}
       >
-        {/* Filter chips */}
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {FILTER_LABELS.map(({ value, label }) => {
-            const isActive = filter === value;
-            const count =
-              value === "all"
-                ? problems.length
-                : problems.filter((p) => p.difficulty.toLowerCase() === value).length;
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 12,
+            alignItems: "center",
+          }}
+        >
+          {/* Search Input */}
+          <div style={{ position: "relative", flexShrink: 0 }}>
+            <span
+              className="material-symbols-outlined"
+              style={{
+                position: "absolute",
+                left: 12,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "var(--color-text-muted)",
+                fontSize: 20,
+              }}
+            >
+              search
+            </span>
+            <input
+              type="text"
+              placeholder="Search problems..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                width: 320,
+                background: "var(--color-surface-highest)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius-md)",
+                padding: "8px 14px 8px 40px",
+                fontSize: 14,
+                fontFamily: "var(--font-mono)",
+                color: "var(--color-text-primary)",
+                outline: "none",
+                transition: "border-color 200ms",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#00f2ff";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "var(--color-border)";
+              }}
+            />
+          </div>
 
+          {/* Difficulty Filter Chips */}
+          {(["easy", "medium", "hard"] as const).map((diff) => {
+            const c = FILTER_COLORS[diff];
+            const active = filter === diff;
             return (
               <button
-                key={value}
-                onClick={() => setFilter(value)}
+                key={diff}
+                onClick={() => setFilter(active ? "all" : diff)}
                 style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  padding: "5px 14px",
-                  borderRadius: "var(--radius-full)",
-                  fontSize: 13,
-                  fontWeight: 600,
+                  padding: "6px 14px",
+                  borderRadius: "var(--radius-md)",
+                  border: `1px solid ${active ? c.border : "var(--color-border)"}`,
+                  color: active ? c.text : "var(--color-text-muted)",
+                  background: active ? c.bg : "transparent",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 12,
+                  fontWeight: 700,
                   cursor: "pointer",
-                  border: isActive
-                    ? "1px solid rgba(79,70,229,0.5)"
-                    : "1px solid var(--color-border)",
-                  background: isActive
-                    ? "rgba(79,70,229,0.15)"
-                    : "transparent",
-                  color: isActive ? "var(--color-primary)" : "var(--color-text-muted)",
-                  transition: "all 150ms",
+                  transition: "all 200ms",
+                  textTransform: "capitalize",
                 }}
               >
-                {label}
-                <span
-                  style={{
-                    padding: "0 5px",
-                    borderRadius: "var(--radius-full)",
-                    background: isActive
-                      ? "rgba(79,70,229,0.25)"
-                      : "var(--color-surface-high)",
-                    fontSize: 10,
-                    fontWeight: 700,
-                    fontFamily: "var(--font-mono)",
-                    color: isActive ? "var(--color-primary)" : "var(--color-text-muted)",
-                  }}
-                >
-                  {count}
-                </span>
+                {diff}
               </button>
             );
           })}
-        </div>
 
-        {/* Search input */}
-        <div style={{ position: "relative" }}>
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+          {/* Count */}
+          <div
             style={{
-              position: "absolute",
-              left: 12,
-              top: "50%",
-              transform: "translateY(-50%)",
+              marginLeft: "auto",
+              fontFamily: "var(--font-mono)",
+              fontSize: 12,
               color: "var(--color-text-muted)",
-              pointerEvents: "none",
             }}
           >
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search problems…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              background: "var(--color-surface-low)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-md)",
-              padding: "7px 12px 7px 34px",
-              fontSize: 13,
-              color: "var(--color-text-primary)",
-              outline: "none",
-              width: 220,
-              transition: "border-color 150ms, box-shadow 150ms",
-              fontFamily: "var(--font-sans)",
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = "var(--color-primary-container)";
-              e.target.style.boxShadow = "0 0 0 3px rgba(79,70,229,0.15)";
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = "var(--color-border)";
-              e.target.style.boxShadow = "none";
-            }}
-          />
+            Showing {filtered.length} of {problems.length} problems
+          </div>
         </div>
       </div>
 
-      {/* Problem table */}
-      <div
-        style={{
-          background: "var(--color-surface-container)",
-          border: "1px solid var(--color-border)",
-          borderRadius: "var(--radius-lg)",
-          overflow: "hidden",
-        }}
-      >
-        {/* Table header */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "48px 1fr 100px 90px 90px",
-            padding: "10px 20px",
-            background: "var(--color-surface-low)",
-            borderBottom: "1px solid var(--color-border)",
-          }}
-        >
-          {["#", "Title", "Difficulty", "Acceptance", "Submissions"].map((h) => (
-            <span
-              key={h}
+      {/* Problem List */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px 32px", background: "#131313" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          {/* Table Header */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "48px 1fr 100px 100px 80px",
+              padding: "8px 16px",
+              fontFamily: "var(--font-mono)",
+              fontSize: 11,
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "0.1em",
+              color: "var(--color-text-muted)",
+              borderBottom: "1px solid var(--color-border)",
+              position: "sticky",
+              top: 0,
+              background: "#131313",
+              zIndex: 5,
+            }}
+          >
+            <div>Status</div>
+            <div>Title</div>
+            <div>Acceptance</div>
+            <div>Difficulty</div>
+            <div style={{ textAlign: "right" }}>Frequency</div>
+          </div>
+
+          {/* Problem Rows */}
+          {filtered.length === 0 ? (
+            <div
               style={{
-                fontSize: 11,
-                fontWeight: 600,
-                textTransform: "uppercase",
-                letterSpacing: "0.07em",
+                padding: "48px 24px",
+                textAlign: "center",
                 color: "var(--color-text-muted)",
+                fontSize: 14,
                 fontFamily: "var(--font-mono)",
               }}
             >
-              {h}
-            </span>
-          ))}
+              No problems found for this filter.
+            </div>
+          ) : (
+            filtered.map((p, i) => {
+              const acceptance = p.total_submissions > 0 ? `${p.success_rate.toFixed(1)}%` : "—";
+              const freqWidth = p.total_submissions > 0 ? Math.min(100, p.success_rate + 20) : 0;
+
+              return (
+                <Link
+                  key={p.id}
+                  href={`/problems/${p.id}`}
+                  className="animate-fade-in card-hover"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "48px 1fr 100px 100px 80px",
+                    padding: "14px 16px",
+                    borderRadius: "var(--radius-md)",
+                    background: "#1a1a1a",
+                    border: "1px solid #2d2d2d",
+                    textDecoration: "none",
+                    alignItems: "center",
+                    transition: "all 200ms",
+                    animationDelay: `${i * 30}ms`,
+                  }}
+                >
+                  {/* Status */}
+                  <span
+                    className="material-symbols-outlined"
+                    style={{
+                      fontSize: 20,
+                      color: "var(--color-border)",
+                    }}
+                  >
+                    radio_button_unchecked
+                  </span>
+
+                  {/* Title */}
+                  <div>
+                    <span
+                      style={{
+                        fontSize: 16,
+                        fontWeight: 600,
+                        color: "var(--color-text-primary)",
+                      }}
+                    >
+                      {p.id}. {p.title}
+                    </span>
+                  </div>
+
+                  {/* Acceptance */}
+                  <span
+                    style={{
+                      fontSize: 14,
+                      color: "var(--color-text-primary)",
+                      fontFamily: "var(--font-mono)",
+                    }}
+                  >
+                    {acceptance}
+                  </span>
+
+                  {/* Difficulty */}
+                  <DifficultyBadge difficulty={p.difficulty} />
+
+                  {/* Frequency Bar */}
+                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <div
+                      style={{
+                        width: 64,
+                        height: 4,
+                        background: "var(--color-surface-highest)",
+                        borderRadius: 2,
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${freqWidth}%`,
+                          height: "100%",
+                          background: "#00f2ff",
+                        }}
+                      />
+                    </div>
+                  </div>
+                </Link>
+              );
+            })
+          )}
         </div>
-
-        {/* Rows */}
-        {filtered.length === 0 ? (
-          <div
-            style={{
-              padding: "48px 24px",
-              textAlign: "center",
-              color: "var(--color-text-muted)",
-              fontSize: 14,
-            }}
-          >
-            No problems found for this filter.
-          </div>
-        ) : (
-          filtered.map((p, i) => (
-            <Link
-              key={p.id}
-              href={`/problems/${p.id}`}
-              className="animate-fade-in"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "48px 1fr 100px 90px 90px",
-                padding: "14px 20px",
-                borderBottom:
-                  i < filtered.length - 1 ? "1px solid var(--color-border)" : "none",
-                textDecoration: "none",
-                alignItems: "center",
-                transition: "background 150ms",
-                animationDelay: `${i * 30}ms`,
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.background =
-                  "var(--color-surface-high)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
-              }}
-            >
-              {/* # */}
-              <span
-                style={{
-                  fontSize: 12,
-                  color: "var(--color-text-muted)",
-                  fontFamily: "var(--font-mono)",
-                }}
-              >
-                {p.id}
-              </span>
-
-              {/* Title */}
-              <span
-                style={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  color: "var(--color-text-primary)",
-                }}
-              >
-                {p.title}
-              </span>
-
-              {/* Difficulty badge */}
-              <div>
-                <DifficultyBadge difficulty={p.difficulty} />
-              </div>
-
-              {/* Acceptance */}
-              <span
-                style={{
-                  fontSize: 13,
-                  color:
-                    p.total_submissions > 0
-                      ? "var(--color-text-secondary)"
-                      : "var(--color-text-muted)",
-                  fontFamily: "var(--font-mono)",
-                }}
-              >
-                {p.total_submissions > 0 ? `${p.success_rate.toFixed(0)}%` : "—"}
-              </span>
-
-              {/* Submissions count */}
-              <span
-                style={{
-                  fontSize: 13,
-                  color: "var(--color-text-muted)",
-                  fontFamily: "var(--font-mono)",
-                }}
-              >
-                {p.total_submissions > 0 ? p.total_submissions.toLocaleString() : "—"}
-              </span>
-            </Link>
-          ))
-        )}
       </div>
-    </div>
+    </SidebarLayout>
   );
 }
