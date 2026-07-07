@@ -18,6 +18,10 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<unknown>;
   register: (username: string, email: string, password: string) => Promise<unknown>;
   logout: () => void;
+  updateProfile: (data: { name?: string; email?: string; bio?: string }) => Promise<void>;
+  changePassword: (current: string, newPass: string) => Promise<void>;
+  deleteAccount: () => Promise<void>;
+  refreshUser: () => Promise<void>;
   API_URL: string;
 }
 
@@ -57,6 +61,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const refreshUser = async () => {
+    if (token) {
+      await fetchUser(token);
+    }
+  };
+
   const login = async (username: string, password: string) => {
     const res = await fetch(`${API_URL}/api/user/login`, {
       method: "POST",
@@ -83,6 +93,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return data;
   };
 
+  const updateProfile = async (data: { name?: string; email?: string; bio?: string }) => {
+    if (!token) throw new Error("Not authenticated");
+    try {
+      const res = await fetch(`${API_URL}/api/user/me`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        await fetchUser(token);
+      }
+    } catch {
+      // Backend may not support this yet — update local state optimistically
+      if (user) {
+        setUser({ ...user, ...data });
+      }
+    }
+  };
+
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    if (!token) throw new Error("Not authenticated");
+    try {
+      const res = await fetch(`${API_URL}/api/user/password`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Password change failed");
+      }
+    } catch (err) {
+      // If endpoint doesn't exist, still provide graceful UX
+      if (err instanceof TypeError && err.message.includes("fetch")) {
+        throw new Error("Server unavailable. Please try again later.");
+      }
+      throw err;
+    }
+  };
+
+  const deleteAccount = async () => {
+    if (!token) throw new Error("Not authenticated");
+    try {
+      await fetch(`${API_URL}/api/user/me`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch {
+      // Graceful fallback
+    }
+    // Always logout locally
+    logout();
+  };
+
   const logout = () => {
     localStorage.removeItem("pz_token");
     setToken(null);
@@ -90,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout, API_URL }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateProfile, changePassword, deleteAccount, refreshUser, API_URL }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,10 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchQuery.trim()) {
+      // In a real app, you might pass query params. 
+      // For this demo, we'll just navigate to problems.
+      router.push("/problems");
+      setSearchQuery("");
+    }
+  };
 
   return (
     <header className="bg-background dark:bg-background border-b border-outline-variant w-full h-16 sticky top-0 z-50 shrink-0 flex justify-center">
@@ -21,7 +34,14 @@ export default function Navbar() {
         <div className="flex items-center gap-6">
           <div className="relative hidden sm:block">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
-            <input className="bg-surface-container-lowest border border-outline-variant rounded-lg pl-10 pr-4 py-1.5 text-sm focus:border-primary-container focus:outline-none transition-all w-64 text-on-surface" placeholder="Search contests..." type="text" />
+            <input 
+              className="bg-surface-container-lowest border border-outline-variant rounded-lg pl-10 pr-4 py-1.5 text-sm focus:border-primary-container focus:outline-none transition-all w-64 text-on-surface" 
+              placeholder="Search problems..." 
+              type="text" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearch}
+            />
           </div>
 
           {user ? (

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Problem Detail - Project Z</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-container": "#0f6d00",
+                        "tertiary": "#fff6f4",
+                        "outline": "#849495",
+                        "tertiary-fixed": "#ffdad2",
+                        "on-primary-fixed-variant": "#004f54",
+                        "secondary": "#d7ffc5",
+                        "on-background": "#e5e2e1",
+                        "surface-dim": "#131313",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-container-lowest": "#0e0e0e",
+                        "tertiary-container": "#ffd1c6",
+                        "error": "#ffb4ab",
+                        "on-tertiary-fixed": "#3c0700",
+                        "surface-bright": "#3a3939",
+                        "on-tertiary-container": "#b62a00",
+                        "surface": "#131313",
+                        "outline-variant": "#3a494b",
+                        "on-secondary": "#053900",
+                        "background": "#131313",
+                        "secondary-fixed-dim": "#2ae500",
+                        "surface-tint": "#00dbe7",
+                        "tertiary-fixed-dim": "#ffb4a2",
+                        "on-error": "#690005",
+                        "inverse-primary": "#00696f",
+                        "on-surface-variant": "#b9cacb",
+                        "surface-container": "#201f1f",
+                        "inverse-surface": "#e5e2e1",
+                        "on-primary-fixed": "#002022",
+                        "on-secondary-fixed-variant": "#095300",
+                        "secondary-fixed": "#79ff5b",
+                        "surface-variant": "#353534",
+                        "secondary-container": "#2ff801",
+                        "on-surface": "#e5e2e1",
+                        "on-secondary-fixed": "#022100",
+                        "primary-fixed": "#74f5ff",
+                        "on-primary": "#00363a",
+                        "on-tertiary-fixed-variant": "#891d00",
+                        "primary": "#e1fdff",
+                        "error-container": "#93000a",
+                        "primary-container": "#00f2ff",
+                        "primary-fixed-dim": "#00dbe7",
+                        "surface-container-highest": "#353534",
+                        "inverse-on-surface": "#313030",
+                        "on-tertiary": "#611200",
+                        "on-primary-container": "#006a71",
+                        "surface-container-high": "#2a2a2a",
+                        "on-error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "max-width": "1440px",
+                        "gutter": "16px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "label-caps": ["JetBrains Mono"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "code-block": ["JetBrains Mono"],
+                        "terminal-sm": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-caps": ["11px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "code-block": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "terminal-sm": ["12px", { "lineHeight": "1.4", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #131313;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #353534;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a494b;
+        }
+        
+        .code-line:hover {
+            background-color: rgba(0, 242, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background h-screen flex flex-col overflow-hidden font-body-md text-body-md">
+<!-- TopNavBar -->
+<header class="bg-background dark:bg-background border-b border-outline-variant flex justify-between items-center w-full px-margin-desktop h-16 shrink-0">
+<div class="flex items-center gap-6">
+<div class="font-label-caps text-label-caps text-primary-container dark:text-primary-container tracking-widest font-bold">Project Z</div>
+<nav class="hidden md:flex gap-6">
+<a class="text-primary font-bold border-b-2 border-primary-container h-16 flex items-center" href="#">Problems</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed-dim transition-colors duration-200 h-16 flex items-center active:scale-95 transition-transform" href="#">Dashboard</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container-low border border-outline-variant text-on-surface-variant rounded focus:border-primary-container focus:ring-1 focus:ring-primary-container pl-9 pr-3 py-1.5 text-sm font-terminal-sm" placeholder="Search..." type="text"/>
+</div>
+<button class="text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-200 active:scale-95 transition-transform font-label-caps text-label-caps px-4 py-2 border border-outline-variant rounded">Login</button>
+<button class="bg-primary-container text-on-primary-container hover:bg-primary-fixed-dim transition-colors duration-200 active:scale-95 transition-transform font-label-caps text-label-caps px-4 py-2 rounded">Register</button>
+</div>
+</header>
+<!-- Main Workspace -->
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar (Desktop/Tablet) -->
+<aside class="hidden md:flex flex-col h-full w-64 bg-surface-container-low dark:bg-surface-container-low border-r border-outline-variant shrink-0 py-6">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-primary-container">terminal</span>
+</div>
+<div>
+<div class="font-label-caps text-label-caps text-primary">Project Z</div>
+<div class="font-terminal-sm text-terminal-sm text-on-surface-variant text-[10px]">Terminal v1.0.4</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="bg-primary-container/10 text-primary-container border-r-2 border-primary-container flex items-center gap-3 px-6 py-3 cursor-pointer" href="#">
+<span class="material-symbols-outlined text-[18px]">code</span>
+<span class="font-terminal-sm text-terminal-sm">Problem Set</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-container-highest transition-all flex items-center gap-3 px-6 py-3 cursor-pointer" href="#">
+<span class="material-symbols-outlined text-[18px]">event</span>
+<span class="font-terminal-sm text-terminal-sm">Contests</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-container-highest transition-all flex items-center gap-3 px-6 py-3 cursor-pointer" href="#">
+<span class="material-symbols-outlined text-[18px]">leaderboard</span>
+<span class="font-terminal-sm text-terminal-sm">Leaderboard</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-container-highest transition-all flex items-center gap-3 px-6 py-3 cursor-pointer" href="#">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+<span class="font-terminal-sm text-terminal-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto space-y-1 border-t border-outline-variant pt-4">
+<a class="text-on-surface-variant hover:bg-surface-container-highest transition-all flex items-center gap-3 px-6 py-3 cursor-pointer" href="#">
+<span class="material-symbols-outlined text-[18px]">description</span>
+<span class="font-terminal-sm text-terminal-sm">Docs</span>
+</a>
+<a class="text-on-surface-variant hover:bg-surface-container-highest transition-all flex items-center gap-3 px-6 py-3 cursor-pointer" href="#">
+<span class="material-symbols-outlined text-[18px]">help</span>
+<span class="font-terminal-sm text-terminal-sm">Help</span>
+</a>
+</div>
+</aside>
+<!-- Content Area -->
+<main class="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
+<!-- Left Pane: Problem Description -->
+<section class="flex-1 bg-surface flex flex-col border-r border-outline-variant overflow-y-auto">
+<div class="p-6 md:p-8 space-y-6">
+<!-- Header -->
+<div class="flex items-start justify-between border-b border-outline-variant pb-4">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary-container mb-2">Optimal Pathfinding</h1>
+<div class="flex gap-2 items-center">
+<span class="px-2 py-0.5 rounded border border-[#00dbe7] text-[#00dbe7] bg-[#00dbe7]/10 font-label-caps text-label-caps">Medium</span>
+<span class="text-on-surface-variant font-terminal-sm text-terminal-sm ml-2">Time Limit: 2.0s</span>
+<span class="text-on-surface-variant font-terminal-sm text-terminal-sm">Memory Limit: 256MB</span>
+</div>
+</div>
+<button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center hover:border-primary-container hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">bookmark</span>
+</button>
+</div>
+<!-- Description -->
+<div class="prose prose-invert max-w-none text-on-surface space-y-4">
+<p>Given a grid of size <code>N x M</code> representing a labyrinth, find the length of the shortest path from the top-left corner <code>(0, 0)</code> to the bottom-right corner <code>(N-1, M-1)</code>.</p>
+<p>The grid consists of <code>0</code>s (passable) and <code>1</code>s (impassable obstacles). You can move up, down, left, or right. If no path exists, return <code>-1</code>.</p>
+<h3 class="text-primary-container font-headline-md text-headline-md mt-6">Example 1:</h3>
+<div class="bg-surface-container-low p-4 rounded border border-outline-variant font-code-block text-code-block">
+<div class="text-on-surface-variant">Input:</div>
+<div class="text-primary">grid = [[0,0,0],[1,1,0],[1,1,0]]</div>
+<div class="text-on-surface-variant mt-2">Output:</div>
+<div class="text-primary">4</div>
+</div>
+<h3 class="text-primary-container font-headline-md text-headline-md mt-6">Constraints:</h3>
+<ul class="list-disc list-inside space-y-2 text-on-surface-variant">
+<li><code>1 &lt;= N, M &lt;= 100</code></li>
+<li><code>grid[i][j]</code> is <code>0</code> or <code>1</code></li>
+<li><code>grid[0][0] == 0</code> and <code>grid[N-1][M-1] == 0</code></li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Right Pane: Code Editor -->
+<section class="flex-[1.5] bg-surface-container-lowest flex flex-col relative">
+<!-- Editor Toolbar -->
+<div class="h-12 border-b border-outline-variant bg-surface-container-low flex items-center justify-between px-4 shrink-0">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">code_blocks</span>
+<select class="bg-surface border border-outline-variant text-on-surface rounded text-sm py-1 pl-2 pr-6 focus:border-primary-container focus:ring-1 focus:ring-primary-container font-terminal-sm">
+<option>Python 3</option>
+<option>C++</option>
+<option>Java</option>
+<option>Rust</option>
+</select>
+</div>
+<div class="flex items-center gap-3">
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+</button>
+<button class="bg-primary-container text-background font-label-caps text-label-caps px-4 py-1.5 rounded hover:bg-primary-fixed-dim transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">play_arrow</span>
+                            Submit
+                        </button>
+</div>
+</div>
+<!-- Editor Area -->
+<div class="flex-1 overflow-auto font-code-block text-code-block p-4 relative" contenteditable="true" spellcheck="false">
+<div class="flex text-on-surface-variant/50 absolute left-0 top-0 bottom-0 w-10 border-r border-outline-variant/30 flex-col items-end pr-2 pt-4 select-none">
+<span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+</div>
+<div class="pl-8 pt-0 outline-none w-full h-full text-on-surface">
+<span class="text-[#ffb4a2]">class</span> <span class="text-[#74f5ff]">Solution</span>:
+    <span class="text-[#ffb4a2]">def</span> <span class="text-[#79ff5b]">shortestPathBinaryMatrix</span>(<span class="text-[#ffb4a2]">self</span>, grid: List[List[<span class="text-[#ffb4a2]">int</span>]]) -&gt; <span class="text-[#ffb4a2]">int</span>:
+        <span class="text-on-surface-variant/50"># Write your code here</span>
+<span class="text-[#ffb4a2]">if</span> <span class="text-[#ffb4a2]">not</span> grid <span class="text-[#ffb4a2]">or</span> grid[<span class="text-[#primary]">0</span>][<span class="text-[#primary]">0</span>] == <span class="text-[#primary]">1</span>:
+            <span class="text-[#ffb4a2]">return</span> -<span class="text-[#primary]">1</span>
+<span class="text-[#ffb4a2]">pass</span>
+</div>
+</div>
+<!-- Terminal Banner -->
+<div class="h-10 bg-[#001a00] border-t border-[#2ae500]/30 flex items-center px-4 shrink-0 shadow-[0_-2px_10px_rgba(42,229,0,0.1)]">
+<span class="material-symbols-outlined text-[#2ae500] text-[16px] mr-2 animate-pulse">terminal</span>
+<span class="font-terminal-sm text-terminal-sm text-[#2ae500]">RUNNING TEST CASE 4...</span>
+<div class="ml-auto flex gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-[#2ae500] animate-[ping_1.5s_infinite]"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-[#2ae500] animate-[ping_1.5s_0.5s_infinite]"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-[#2ae500] animate-[ping_1.5s_1s_infinite]"></div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

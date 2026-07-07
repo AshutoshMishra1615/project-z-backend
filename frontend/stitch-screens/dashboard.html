@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Dashboard - Project Z</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-container": "#0f6d00",
+                      "tertiary": "#fff6f4",
+                      "outline": "#849495",
+                      "tertiary-fixed": "#ffdad2",
+                      "on-primary-fixed-variant": "#004f54",
+                      "secondary": "#d7ffc5",
+                      "on-background": "#e5e2e1",
+                      "surface-dim": "#131313",
+                      "surface-container-low": "#1c1b1b",
+                      "surface-container-lowest": "#0e0e0e",
+                      "tertiary-container": "#ffd1c6",
+                      "error": "#ffb4ab",
+                      "on-tertiary-fixed": "#3c0700",
+                      "surface-bright": "#3a3939",
+                      "on-tertiary-container": "#b62a00",
+                      "surface": "#131313",
+                      "outline-variant": "#3a494b",
+                      "on-secondary": "#053900",
+                      "background": "#131313",
+                      "secondary-fixed-dim": "#2ae500",
+                      "surface-tint": "#00dbe7",
+                      "tertiary-fixed-dim": "#ffb4a2",
+                      "on-error": "#690005",
+                      "inverse-primary": "#00696f",
+                      "on-surface-variant": "#b9cacb",
+                      "surface-container": "#201f1f",
+                      "inverse-surface": "#e5e2e1",
+                      "on-primary-fixed": "#002022",
+                      "on-secondary-fixed-variant": "#095300",
+                      "secondary-fixed": "#79ff5b",
+                      "surface-variant": "#353534",
+                      "secondary-container": "#2ff801",
+                      "on-surface": "#e5e2e1",
+                      "on-secondary-fixed": "#022100",
+                      "primary-fixed": "#74f5ff",
+                      "on-primary": "#00363a",
+                      "on-tertiary-fixed-variant": "#891d00",
+                      "primary": "#e1fdff",
+                      "error-container": "#93000a",
+                      "primary-container": "#00f2ff",
+                      "primary-fixed-dim": "#00dbe7",
+                      "surface-container-highest": "#353534",
+                      "inverse-on-surface": "#313030",
+                      "on-tertiary": "#611200",
+                      "on-primary-container": "#006a71",
+                      "surface-container-high": "#2a2a2a",
+                      "on-error-container": "#ffdad6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "max-width": "1440px",
+                      "gutter": "16px",
+                      "margin-mobile": "16px",
+                      "margin-desktop": "32px",
+                      "unit": "4px"
+              },
+              "fontFamily": {
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "JetBrains Mono"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "code-block": [
+                              "JetBrains Mono"
+                      ],
+                      "terminal-sm": [
+                              "JetBrains Mono"
+                      ]
+              },
+              "fontSize": {
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-caps": [
+                              "11px",
+                              {
+                                      "lineHeight": "1.0",
+                                      "letterSpacing": "0.1em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "code-block": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "terminal-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "500"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #131313;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #353534;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #3a494b;
+        }
+        
+        /* Subtle glow effects */
+        .glow-hover:hover {
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
+            border-color: #00f2ff;
+        }
+        
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased overflow-hidden flex h-screen">
+<!-- SideNavBar (from JSON) -->
+<nav class="hidden md:flex flex-col h-full py-6 bg-surface-container-low dark:bg-surface-container-low docked left-0 h-full w-64 border-r border-outline-variant flat no shadows font-terminal-sm text-terminal-sm flex-shrink-0 z-10">
+<div class="px-6 mb-8 flex items-center space-x-4">
+<div class="w-10 h-10 rounded-full border border-outline-variant overflow-hidden">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="A striking portrait of a focused individual in a high-tech environment. The lighting is cool and precise, evoking a minimalist-techno aesthetic. Deep blacks and sleek surfaces surround the subject, with subtle hints of cyan blue reflecting off elements in the background, creating a mood of intense concentration and elite performance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx2JZiDLN-sB7zMEnOfkA02qakXCTiedPFLDENiEjidJ-y5qr0jdDP7c0XDduIOTxcXrmmSz_cwUvxsjTDA3DjMl3Es4FuRbbixZidjC5JYIM9-Wv9OzZPTd0VwOuJlLDAgVRxPlgrMBc1K3oRsB0G0tzXpIwflM975et7T-LWOpEqpvyERv3Hq_g2ztkzPqGwuqjOxmw33x7bd2pgtkaAM4UZ48lvxRktZe7ovz9htc5du79W9FSQkgfZVgbPAWGUTNxumoIat98"/>
+</div>
+<div>
+<h1 class="font-label-caps text-label-caps text-primary tracking-wider">Project Z</h1>
+<p class="text-on-surface-variant opacity-70">Terminal v1.0.4</p>
+</div>
+</div>
+<div class="flex-grow flex flex-col space-y-2 px-4">
+<a class="flex items-center space-x-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-highest transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">code</span>
+<span>Problem Set</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-highest transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">event</span>
+<span>Contests</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-highest transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">leaderboard</span>
+<span>Leaderboard</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-DEFAULT bg-primary-container/10 text-primary-container border-r-2 border-primary-container hover:bg-surface-container-highest transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span>Settings</span>
+</a>
+</div>
+<div class="mt-auto px-4 flex flex-col space-y-2 border-t border-outline-variant pt-4">
+<a class="flex items-center space-x-3 px-4 py-2 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-highest transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined text-[18px]">description</span>
+<span>Docs</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-2 rounded-DEFAULT text-on-surface-variant hover:bg-surface-container-highest transition-all cursor-pointer" href="#">
+<span class="material-symbols-outlined text-[18px]">help</span>
+<span>Help</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col h-full overflow-hidden relative">
+<!-- TopNavBar (from JSON) - Visible on mobile or as supplementary header -->
+<header class="flex justify-between items-center w-full px-margin-desktop h-16 max-w-max-width mx-auto bg-background dark:bg-background docked full-width top-0 border-b border-outline-variant flat no shadows z-10 flex-shrink-0">
+<div class="flex items-center space-x-6 md:hidden">
+<span class="font-label-caps text-label-caps text-primary-container dark:text-primary-container">Project Z</span>
+</div>
+<div class="hidden md:flex flex-1 justify-center space-x-8">
+<!-- Top nav links disabled on dashboard to avoid conflict with sidebar context -->
+</div>
+<div class="flex items-center space-x-4">
+<button class="font-label-caps text-label-caps text-on-surface-variant hover:text-primary-fixed-dim transition-colors duration-200 active:scale-95 transition-transform px-4 py-2 border border-outline-variant rounded-DEFAULT hover:border-primary-container">Login</button>
+<button class="font-label-caps text-label-caps bg-primary-container text-on-primary-container hover:opacity-90 transition-colors duration-200 active:scale-95 transition-transform px-4 py-2 rounded-DEFAULT font-bold">Register</button>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="flex-grow overflow-y-auto custom-scrollbar p-gutter md:p-margin-desktop">
+<div class="max-w-7xl mx-auto space-y-6">
+<!-- Header -->
+<div class="flex items-center justify-between mb-8">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary tracking-tight">Dashboard</h2>
+<p class="text-on-surface-variant mt-1 font-terminal-sm text-terminal-sm">Overview of your coding performance</p>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Stats Card: Problems Solved (Circular Progress) -->
+<div class="bg-surface-container-low border border-outline-variant rounded-lg p-6 glow-hover transition-all flex flex-col items-center justify-center relative col-span-1 min-h-[250px]">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant absolute top-6 left-6">Problems Solved</h3>
+<div class="relative w-40 h-40 mt-4">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<!-- Background circle -->
+<circle class="text-surface-variant stroke-current" cx="50" cy="50" fill="transparent" r="40" stroke-width="8"></circle>
+<!-- Progress circle (Neon Green / secondary-fixed) -->
+<circle class="text-secondary-fixed stroke-current progress-ring__circle" cx="50" cy="50" fill="transparent" r="40" stroke-dasharray="251.2" stroke-dashoffset="62.8" stroke-linecap="round" stroke-width="8"></circle>
+<!-- Glow effect -->
+<circle class="text-secondary-fixed stroke-current progress-ring__circle opacity-30" cx="50" cy="50" fill="transparent" filter="blur(4px)" r="40" stroke-dasharray="251.2" stroke-dashoffset="62.8" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-headline-md text-headline-md text-secondary-fixed">342</span>
+<span class="font-terminal-sm text-terminal-sm text-on-surface-variant">/ 500</span>
+</div>
+</div>
+</div>
+<!-- Stats Card: Accuracy -->
+<div class="bg-surface-container-low border border-outline-variant rounded-lg p-6 glow-hover transition-all flex flex-col justify-between col-span-1 min-h-[250px]">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant">Accuracy Rate</h3>
+<div class="flex-grow flex flex-col items-center justify-center">
+<div class="text-[48px] font-bold font-headline-md text-primary-container leading-none mb-2 tracking-tighter">88.5<span class="text-headline-md">%</span></div>
+<div class="w-full mt-6 space-y-3">
+<div class="flex items-center justify-between font-terminal-sm text-terminal-sm">
+<span class="text-on-surface-variant">Easy</span>
+<span class="text-secondary-fixed">95%</span>
+</div>
+<div class="w-full h-1 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed w-[95%]"></div>
+</div>
+<div class="flex items-center justify-between font-terminal-sm text-terminal-sm mt-3">
+<span class="text-on-surface-variant">Medium</span>
+<span class="text-primary-container">82%</span>
+</div>
+<div class="w-full h-1 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[82%]"></div>
+</div>
+<div class="flex items-center justify-between font-terminal-sm text-terminal-sm mt-3">
+<span class="text-on-surface-variant">Hard</span>
+<span class="text-error">65%</span>
+</div>
+<div class="w-full h-1 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-error w-[65%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Heatmap Placeholder -->
+<div class="bg-surface-container-low border border-outline-variant rounded-lg p-6 glow-hover transition-all flex flex-col col-span-1 md:col-span-1 min-h-[250px]">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4">Submission Activity</h3>
+<div class="flex-grow flex items-center justify-center bg-surface border border-outline-variant rounded opacity-70 p-4">
+<!-- Simplified pseudo-heatmap using grid -->
+<div class="grid grid-cols-12 gap-1 w-full h-full content-center">
+<!-- Generate some random blocks via JS ideally, hardcoding a few for layout -->
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/20 rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/50 rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed rounded-sm glow-hover"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/80 rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/30 rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/40 rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/90 rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed rounded-sm glow-hover"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/20 rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/60 rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/10 rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/70 rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/30 rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/50 rounded-sm"></div>
+<div class="aspect-square bg-secondary-fixed/80 rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+<div class="aspect-square bg-surface-variant rounded-sm"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Submissions List -->
+<div class="mt-8">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4">Recent Submissions</h3>
+<div class="bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden">
+<!-- List Header -->
+<div class="grid grid-cols-12 gap-4 p-4 border-b border-outline-variant bg-surface-container font-terminal-sm text-terminal-sm text-on-surface-variant">
+<div class="col-span-2">Time</div>
+<div class="col-span-5">Problem</div>
+<div class="col-span-2">Language</div>
+<div class="col-span-3">Status</div>
+</div>
+<!-- List Items -->
+<div class="divide-y divide-outline-variant font-code-block text-code-block">
+<!-- Item 1: Accepted -->
+<div class="grid grid-cols-12 gap-4 p-4 items-center hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="col-span-2 text-on-surface-variant">10m ago</div>
+<div class="col-span-5 text-inverse-surface group-hover:text-primary-container transition-colors truncate">Binary Tree Maximum Path Sum</div>
+<div class="col-span-2 text-on-surface-variant">C++</div>
+<div class="col-span-3">
+<span class="inline-flex items-center px-2 py-1 border border-secondary-fixed text-secondary-fixed bg-secondary-fixed/10 font-label-caps text-label-caps rounded-sm">
+                                        Accepted
+                                    </span>
+</div>
+</div>
+<!-- Item 2: Wrong Answer -->
+<div class="grid grid-cols-12 gap-4 p-4 items-center hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="col-span-2 text-on-surface-variant">1h ago</div>
+<div class="col-span-5 text-inverse-surface group-hover:text-primary-container transition-colors truncate">Median of Two Sorted Arrays</div>
+<div class="col-span-2 text-on-surface-variant">Python3</div>
+<div class="col-span-3">
+<span class="inline-flex items-center px-2 py-1 border border-error text-error bg-error/10 font-label-caps text-label-caps rounded-sm">
+                                        Wrong Answer
+                                    </span>
+</div>
+</div>
+<!-- Item 3: Time Limit Exceeded -->
+<div class="grid grid-cols-12 gap-4 p-4 items-center hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="col-span-2 text-on-surface-variant">3h ago</div>
+<div class="col-span-5 text-inverse-surface group-hover:text-primary-container transition-colors truncate">Word Break II</div>
+<div class="col-span-2 text-on-surface-variant">Java</div>
+<div class="col-span-3">
+<span class="inline-flex items-center px-2 py-1 border border-tertiary-fixed-dim text-tertiary-fixed-dim bg-tertiary-fixed-dim/10 font-label-caps text-label-caps rounded-sm">
+                                        Time Limit Exceeded
+                                    </span>
+</div>
+</div>
+<!-- Item 4: Accepted -->
+<div class="grid grid-cols-12 gap-4 p-4 items-center hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="col-span-2 text-on-surface-variant">Yesterday</div>
+<div class="col-span-5 text-inverse-surface group-hover:text-primary-container transition-colors truncate">LRU Cache</div>
+<div class="col-span-2 text-on-surface-variant">C++</div>
+<div class="col-span-3">
+<span class="inline-flex items-center px-2 py-1 border border-secondary-fixed text-secondary-fixed bg-secondary-fixed/10 font-label-caps text-label-caps rounded-sm">
+                                        Accepted
+                                    </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Terminal Banner (Bottom of screen) -->
+<div class="w-full bg-surface-container-lowest border-t border-outline-variant p-2 px-4 font-terminal-sm text-terminal-sm text-primary-container flex items-center justify-between z-20 flex-shrink-0">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-[16px]">terminal</span>
+<span>user@projectz:~$ status --dashboard</span>
+</div>
+<div class="text-on-surface-variant opacity-70">
+                system optimal / ping 12ms
+            </div>
+</div>
+</main>
+</body></html>

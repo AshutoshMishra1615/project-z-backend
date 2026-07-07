@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import Link from "next/link";
 
 export default function AuthPage() {
@@ -16,6 +17,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const { login, register } = useAuth();
+  const { addToast } = useToast();
   const router = useRouter();
 
   // Reset form when switching tabs
@@ -258,7 +260,7 @@ export default function AuthPage() {
         {/* Social Logins */}
         {isLogin ? (
           <div className="grid grid-cols-3 gap-3">
-            <button className="flex flex-col items-center justify-center gap-2 p-3 bg-surface-container border border-outline-variant rounded hover:border-primary-container/40 hover:bg-surface-variant/20 transition-all active:scale-95 group cursor-pointer">
+            <button onClick={() => addToast("GitHub login coming soon", "info")} className="flex flex-col items-center justify-center gap-2 p-3 bg-surface-container border border-outline-variant rounded hover:border-primary-container/40 hover:bg-surface-variant/20 transition-all active:scale-95 group cursor-pointer">
               <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary-container transition-colors">
                 terminal
               </span>
@@ -266,7 +268,7 @@ export default function AuthPage() {
                 GITHUB
               </span>
             </button>
-            <button className="flex flex-col items-center justify-center gap-2 p-3 bg-surface-container border border-outline-variant rounded hover:border-primary-container/40 hover:bg-surface-variant/20 transition-all active:scale-95 group cursor-pointer">
+            <button onClick={() => addToast("Google login coming soon", "info")} className="flex flex-col items-center justify-center gap-2 p-3 bg-surface-container border border-outline-variant rounded hover:border-primary-container/40 hover:bg-surface-variant/20 transition-all active:scale-95 group cursor-pointer">
               <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary-container transition-colors">
                 shield
               </span>
@@ -274,7 +276,7 @@ export default function AuthPage() {
                 GOOGLE
               </span>
             </button>
-            <button className="flex flex-col items-center justify-center gap-2 p-3 bg-surface-container border border-outline-variant rounded hover:border-primary-container/40 hover:bg-surface-variant/20 transition-all active:scale-95 group cursor-pointer">
+            <button onClick={() => addToast("Discord login coming soon", "info")} className="flex flex-col items-center justify-center gap-2 p-3 bg-surface-container border border-outline-variant rounded hover:border-primary-container/40 hover:bg-surface-variant/20 transition-all active:scale-95 group cursor-pointer">
               <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary-container transition-colors">
                 hub
               </span>
@@ -285,11 +287,11 @@ export default function AuthPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-2 border border-outline-variant py-2.5 rounded font-terminal-sm text-terminal-sm text-on-surface hover:bg-surface-variant/20 transition-all active:scale-95 cursor-pointer">
+            <button onClick={() => addToast("GitHub registration coming soon", "info")} className="flex items-center justify-center gap-2 border border-outline-variant py-2.5 rounded font-terminal-sm text-terminal-sm text-on-surface hover:bg-surface-variant/20 transition-all active:scale-95 cursor-pointer">
               <img alt="GitHub Logo" className="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlPNwTVW-HgdWcLg2CWucV43vPxfvlO7a8PAwTxMjG5lopJxuMaSuI2hGbBOYbNt96quUONT4GlG-gSVUG0WFLVyzMz0lT_vDD8VWB037xNHYaWXwjr1Ee6owklPTu2J-1p4VCd9IN1_zBz7drcoUPYCzfVhd4ZLPEjQnb2qBPW8K0mPamjqdseeO2Qm0Qd-97PlqrjktswyflhkM3Vt8ogHgdiRMfcGGlYcZakD-vGxoj-f-izfyIyR-GO8aY0f7iqQ2Zx_grM20" />
               GitHub
             </button>
-            <button className="flex items-center justify-center gap-2 border border-outline-variant py-2.5 rounded font-terminal-sm text-terminal-sm text-on-surface hover:bg-surface-variant/20 transition-all active:scale-95 cursor-pointer">
+            <button onClick={() => addToast("Discord registration coming soon", "info")} className="flex items-center justify-center gap-2 border border-outline-variant py-2.5 rounded font-terminal-sm text-terminal-sm text-on-surface hover:bg-surface-variant/20 transition-all active:scale-95 cursor-pointer">
               <img alt="Discord Logo" className="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfCijKW7_8eoVU9_RiTW4UN2q7ImtPezR_QRDCTJEGX2EHev6O1k-_Wfr82pOD5Fz5YLvbhZJCKTGB-QyJ2TQXZM__liOEC-UP2jEmp1antCQ-2Yy3Quw46mH6aiC2RTydqRzJPeIiQHSLfEKN_SD8lWU9-WIs4jCRIrr3kpBlV8ReeDPZpzEoD_nOZrNERMvq12rb-VmmVECpiVuSQWvqzISEf3nr4CwLd-eyDUm9CV4--d-nMZaMMaT6yAs182QgVq4CYlymgjY" />
               Discord
             </button>

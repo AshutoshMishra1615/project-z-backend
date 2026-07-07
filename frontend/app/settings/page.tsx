@@ -1,110 +1,147 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import SidebarLayout from "../components/Sidebar";
 
+function Toggle({ label, desc, storageKey, defaultOn = false }: { label: string; desc?: string; storageKey: string; defaultOn?: boolean }) {
+  const [on, setOn] = useState(defaultOn);
+  const { addToast } = useToast();
+  useEffect(() => { const v = localStorage.getItem(storageKey); if (v !== null) setOn(v === "true"); }, [storageKey]);
+  const toggle = () => { const next = !on; setOn(next); localStorage.setItem(storageKey, String(next)); addToast(`${label} ${next ? "enabled" : "disabled"}`, "info"); };
+  return (
+    <div className="flex items-center justify-between p-2">
+      <div><span className="font-body-md text-on-surface text-sm">{label}</span>{desc && <p className="text-xs text-on-surface-variant">{desc}</p>}</div>
+      <label className="relative inline-flex items-center cursor-pointer">
+        <input type="checkbox" className="sr-only peer" checked={on} onChange={toggle} />
+        <div className="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-secondary-fixed-dim after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+      </label>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
+  const { user, token, loading: authLoading, updateProfile, changePassword, deleteAccount } = useAuth();
+  const { addToast } = useToast();
+  const router = useRouter();
   const [activeSection, setActiveSection] = useState("profile");
+  const [displayName, setDisplayName] = useState("");
+  const [username, setUsername] = useState("");
+  const [bio, setBio] = useState("");
+  const [country, setCountry] = useState("United States");
+  const [website, setWebsite] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [curPass, setCurPass] = useState("");
+  const [newPass, setNewPass] = useState("");
+  const [confPass, setConfPass] = useState("");
+  const [changingPass, setChangingPass] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [selectedTheme, setSelectedTheme] = useState("dark");
+  const [tabSize, setTabSize] = useState(2);
+  const [fontSize, setFontSize] = useState(14);
+  const [accentColor, setAccentColor] = useState("#00dbe7");
+
+  useEffect(() => { if (!authLoading && !user && !token) router.push("/auth"); }, [user, token, authLoading, router]);
+  useEffect(() => { if (user) { setDisplayName(user.name || ""); setUsername(user.name || ""); } }, [user]);
 
   useEffect(() => {
     const container = document.getElementById("settings-scroll-container");
     if (!container) return;
-
-    const sections = document.querySelectorAll("main section");
-
-    const handleScroll = () => {
-      let current = "";
-      sections.forEach((section) => {
-        const sectionTop = (section as HTMLElement).offsetTop;
-        if (container.scrollTop >= sectionTop - 150) {
-          current = section.getAttribute("id") || "";
-        }
-      });
-      if (current) setActiveSection(current);
-    };
-
+    const sections = container.querySelectorAll("section");
+    const handleScroll = () => { let cur = ""; sections.forEach((s) => { if (container.scrollTop >= (s as HTMLElement).offsetTop - 150) cur = s.id || ""; }); if (cur) setActiveSection(cur); };
     container.addEventListener("scroll", handleScroll);
     return () => container.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault();
     const container = document.getElementById("settings-scroll-container");
     const target = document.getElementById(id);
-    if (container && target) {
-      container.scrollTo({
-        top: target.offsetTop - 100,
-        behavior: "smooth",
-      });
-      setActiveSection(id);
-    }
+    if (container && target) { container.scrollTo({ top: target.offsetTop - 100, behavior: "smooth" }); setActiveSection(id); }
   };
+
+  const handleSaveProfile = async () => {
+    setSaving(true);
+    try { await updateProfile({ name: displayName, bio }); addToast("Profile saved successfully", "success"); } catch { addToast("Failed to save profile", "error"); } finally { setSaving(false); }
+  };
+
+  const handleChangePassword = async () => {
+    if (newPass !== confPass) { addToast("Passwords do not match", "error"); return; }
+    if (newPass.length < 6) { addToast("Password must be at least 6 characters", "error"); return; }
+    setChangingPass(true);
+    try { await changePassword(curPass, newPass); addToast("Password changed successfully", "success"); setCurPass(""); setNewPass(""); setConfPass(""); } catch (e) { addToast(e instanceof Error ? e.message : "Failed to change password", "error"); } finally { setChangingPass(false); }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirm !== "DELETE") { addToast("Type DELETE to confirm", "error"); return; }
+    await deleteAccount();
+    addToast("Account deleted", "info");
+    router.push("/");
+  };
+
+  if (authLoading) return <SidebarLayout><div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}><span className="spinner spinner-lg" /></div></SidebarLayout>;
+
+  const NAV = [
+    { id: "profile", icon: "person", label: "Profile" },
+    { id: "account", icon: "security", label: "Account & Security" },
+    { id: "editor", icon: "settings_input_component", label: "Editor Preferences" },
+    { id: "notifications", icon: "notifications", label: "Notifications" },
+    { id: "appearance", icon: "palette", label: "Appearance" },
+    { id: "danger", icon: "report_problem", label: "Danger Zone", isDanger: true },
+  ];
 
   return (
     <SidebarLayout>
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          .glow-cyan:focus-within {
-              box-shadow: 0 0 0 1px #00dbe7, 0 0 8px rgba(0, 219, 231, 0.2);
-          }
-        `
-      }} />
+      <style dangerouslySetInnerHTML={{ __html: `.glow-cyan:focus-within { box-shadow: 0 0 0 1px #00dbe7, 0 0 8px rgba(0,219,231,0.2); }` }} />
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }}>
+          <div style={{ background: "#1c1b1b", border: "1px solid rgba(255,180,171,0.3)", borderRadius: 8, padding: 32, maxWidth: 420, width: "90%" }}>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: "#ffb4ab", marginBottom: 12 }}>Delete Account</h3>
+            <p style={{ fontSize: 14, color: "var(--color-on-surface-variant)", marginBottom: 20, lineHeight: 1.6 }}>This action is <strong>permanent</strong> and cannot be undone. Type <code style={{ color: "#ffb4ab", background: "rgba(255,180,171,0.1)", padding: "2px 6px", borderRadius: 3 }}>DELETE</code> to confirm.</p>
+            <input value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)} placeholder="Type DELETE" style={{ width: "100%", background: "#131313", border: "1px solid rgba(255,180,171,0.3)", borderRadius: 4, padding: "10px 14px", color: "#ffb4ab", fontFamily: "var(--font-code-block)", fontSize: 14, outline: "none", marginBottom: 16 }} />
+            <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+              <button onClick={() => { setShowDeleteModal(false); setDeleteConfirm(""); }} style={{ padding: "8px 20px", borderRadius: 4, border: "1px solid var(--color-outline-variant)", background: "transparent", color: "var(--color-on-surface-variant)", cursor: "pointer", fontWeight: 600, fontSize: 13 }}>Cancel</button>
+              <button onClick={handleDeleteAccount} style={{ padding: "8px 20px", borderRadius: 4, border: "1px solid #ffb4ab", background: deleteConfirm === "DELETE" ? "#ffb4ab" : "transparent", color: deleteConfirm === "DELETE" ? "#131313" : "#ffb4ab", cursor: "pointer", fontWeight: 700, fontSize: 13, opacity: deleteConfirm === "DELETE" ? 1 : 0.5, transition: "all 200ms" }}>Delete Forever</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-1 overflow-hidden bg-background w-full">
-        {/* Settings Inner Sidebar */}
         <aside className="w-64 border-r border-outline-variant overflow-y-auto py-8 hidden lg:flex flex-col flex-shrink-0">
           <div className="px-6 mb-6">
             <h2 className="font-headline-md text-headline-md text-on-surface">Settings</h2>
             <p className="font-label-caps text-label-caps text-on-surface-variant opacity-60 mt-1">v2.4.0-stable</p>
           </div>
           <nav className="flex-1 space-y-1">
-            {[
-              { id: "profile", icon: "person", label: "Profile" },
-              { id: "account", icon: "security", label: "Account & Security" },
-              { id: "editor", icon: "settings_input_component", label: "Editor Preferences" },
-              { id: "notifications", icon: "notifications", label: "Notifications" },
-              { id: "appearance", icon: "palette", label: "Appearance" },
-              { id: "danger", icon: "report_problem", label: "Danger Zone", isDanger: true },
-            ].map((item) => {
-              const isActive = activeSection === item.id;
-              return (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  onClick={(e) => scrollToSection(e, item.id)}
-                  className={`flex items-center gap-3 px-6 py-3 transition-all ${
-                    isActive
-                      ? "text-primary-fixed-dim border-l-2 border-primary-fixed-dim bg-primary-container/10"
-                      : item.isDanger
-                      ? "text-error hover:bg-error/10 hover:text-error"
-                      : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
-                  }`}
-                >
-                  <span className="material-symbols-outlined">{item.icon}</span>
-                  <span className="font-label-caps text-label-caps">{item.label}</span>
-                </a>
-              );
-            })}
+            {NAV.map(item => (
+              <a key={item.id} href={`#${item.id}`} onClick={e => scrollTo(e, item.id)} className={`flex items-center gap-3 px-6 py-3 transition-all ${activeSection === item.id ? "text-primary-fixed-dim border-l-2 border-primary-fixed-dim bg-primary-container/10" : item.isDanger ? "text-error hover:bg-error/10" : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"}`}>
+                <span className="material-symbols-outlined">{item.icon}</span>
+                <span className="font-label-caps text-label-caps">{item.label}</span>
+              </a>
+            ))}
           </nav>
         </aside>
 
-        {/* Main Content Area */}
         <main id="settings-scroll-container" className="flex-1 overflow-y-auto p-8 relative scroll-smooth">
           <div className="max-w-4xl mx-auto space-y-16 pb-24">
-            
-            {/* Section: Profile */}
+
+            {/* Profile */}
             <section id="profile" className="scroll-mt-24">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="h-1 w-8 bg-primary-fixed-dim rounded-full"></div>
-                <h3 className="font-headline-md text-headline-md text-on-surface">Profile</h3>
-              </div>
+              <div className="flex items-center gap-4 mb-8"><div className="h-1 w-8 bg-primary-fixed-dim rounded-full" /><h3 className="font-headline-md text-headline-md text-on-surface">Profile</h3></div>
               <div className="bg-surface-container-lowest border border-outline-variant p-8 rounded-lg">
                 <div className="flex flex-col md:flex-row gap-12">
                   <div className="flex flex-col items-center gap-4">
                     <div className="relative group">
-                      <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-outline-variant group-hover:border-primary-fixed-dim transition-colors">
-                        <img alt="Avatar" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBexx83bVcY_V4y5Rp9NjKzZewtaWQF-LNtb9XJxStnqS8OCM7W1suM0_UZfpZ3P2DlyT08zG-98lYmpA3AXliuz9bHoN7zvG4ZYTKQv_1HF2BYZyuEONCaKrc0Mbk6S_diJwXMfmKnLPJIlnLamEHQqBsqfGJE7Ejj_cVv-1iUxtvJKK4frxBpcGdcAYWJ8RFGTB9aq8M4Uf6l8h17tSRz8314gMlSQFGI6X0Iyk0W4pB1fsYWSNnzto-BNM3WrYsTsanFVdbKh_I"/>
+                      <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-outline-variant group-hover:border-primary-fixed-dim transition-colors flex items-center justify-center bg-surface-container-highest text-4xl font-bold text-primary-container">
+                        {user?.name?.charAt(0)?.toUpperCase() || "?"}
                       </div>
-                      <button className="absolute bottom-0 right-0 p-2 bg-primary-fixed-dim text-on-primary rounded-full hover:scale-110 transition-transform shadow-lg">
+                      <button onClick={() => addToast("Avatar upload coming soon", "info")} className="absolute bottom-0 right-0 p-2 bg-primary-fixed-dim text-on-primary rounded-full hover:scale-110 transition-transform shadow-lg">
                         <span className="material-symbols-outlined text-sm">edit</span>
                       </button>
                     </div>
@@ -114,93 +151,74 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="font-label-caps text-[11px] text-on-surface-variant block">DISPLAY NAME</label>
-                        <input className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-on-surface focus:outline-none glow-cyan transition-all" type="text" defaultValue="Neo Hacker"/>
+                        <input className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-on-surface focus:outline-none glow-cyan transition-all" value={displayName} onChange={e => setDisplayName(e.target.value)} />
                       </div>
                       <div className="space-y-2">
                         <label className="font-label-caps text-[11px] text-on-surface-variant block">USERNAME</label>
-                        <input className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-on-surface focus:outline-none glow-cyan transition-all" type="text" defaultValue="neohacker_z"/>
+                        <input className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-on-surface focus:outline-none glow-cyan transition-all" value={username} onChange={e => setUsername(e.target.value)} />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <label className="font-label-caps text-[11px] text-on-surface-variant block">BIO</label>
-                      <textarea className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-on-surface focus:outline-none glow-cyan transition-all" rows={3} defaultValue="Senior developer focusing on competitive programming and system architecture. Always looking for the most optimized O(n log n) solution."></textarea>
+                      <textarea className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-on-surface focus:outline-none glow-cyan transition-all" rows={3} value={bio} onChange={e => setBio(e.target.value)} placeholder="Tell us about yourself..." />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="font-label-caps text-[11px] text-on-surface-variant block">COUNTRY</label>
-                        <select className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-on-surface focus:outline-none glow-cyan transition-all outline-none">
-                          <option>United States</option>
-                          <option>Canada</option>
-                          <option>United Kingdom</option>
-                          <option>Germany</option>
-                          <option>Japan</option>
+                        <select className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-on-surface focus:outline-none glow-cyan transition-all outline-none" value={country} onChange={e => setCountry(e.target.value)}>
+                          {["United States","Canada","United Kingdom","Germany","Japan","India"].map(c => <option key={c}>{c}</option>)}
                         </select>
                       </div>
                       <div className="space-y-2">
                         <label className="font-label-caps text-[11px] text-on-surface-variant block">WEBSITE URL</label>
-                        <input className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-on-surface focus:outline-none glow-cyan transition-all" placeholder="https://github.com/..." type="url"/>
+                        <input className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-on-surface focus:outline-none glow-cyan transition-all" placeholder="https://github.com/..." value={website} onChange={e => setWebsite(e.target.value)} />
                       </div>
                     </div>
                     <div className="pt-4">
-                      <button className="px-8 py-2.5 bg-primary-fixed-dim text-on-primary-fixed font-semibold rounded text-sm hover:brightness-110 active:opacity-80 transition-all shadow-glow">Save Changes</button>
+                      <button onClick={handleSaveProfile} disabled={saving} className="px-8 py-2.5 bg-primary-fixed-dim text-on-primary-fixed font-semibold rounded text-sm hover:brightness-110 active:opacity-80 transition-all disabled:opacity-50 disabled:cursor-wait">
+                        {saving ? "Saving..." : "Save Changes"}
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* Section: Account & Security */}
+            {/* Account & Security */}
             <section id="account" className="scroll-mt-24">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="h-1 w-8 bg-secondary-fixed-dim rounded-full"></div>
-                <h3 className="font-headline-md text-headline-md text-on-surface">Account & Security</h3>
-              </div>
+              <div className="flex items-center gap-4 mb-8"><div className="h-1 w-8 bg-secondary-fixed-dim rounded-full" /><h3 className="font-headline-md text-headline-md text-on-surface">Account & Security</h3></div>
               <div className="space-y-6">
                 <div className="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg flex items-center justify-between">
                   <div className="space-y-1">
                     <p className="font-label-caps text-[11px] text-on-surface-variant">EMAIL ADDRESS</p>
                     <div className="flex items-center gap-3">
-                      <span className="font-body-md text-on-surface">neo.hacker@proton.me</span>
+                      <span className="font-body-md text-on-surface">{user?.email || "Not set"}</span>
                       <span className="px-2 py-0.5 rounded bg-secondary-container/10 border border-secondary-fixed-dim text-secondary-fixed-dim text-[10px] font-bold">VERIFIED</span>
                     </div>
                   </div>
-                  <button className="text-primary-fixed-dim text-sm font-medium hover:underline">Change</button>
+                  <button onClick={() => addToast("Email change coming soon", "info")} className="text-primary-fixed-dim text-sm font-medium hover:underline">Change</button>
                 </div>
                 <div className="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg">
                   <p className="font-label-caps text-[11px] text-on-surface-variant mb-6">PASSWORD</p>
-                  <form className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <input className="bg-surface-container border border-outline-variant rounded px-4 py-2 text-sm focus:outline-none focus:border-primary-fixed-dim glow-cyan transition-colors" placeholder="Current Password" type="password"/>
-                    <input className="bg-surface-container border border-outline-variant rounded px-4 py-2 text-sm focus:outline-none focus:border-primary-fixed-dim glow-cyan transition-colors" placeholder="New Password" type="password"/>
-                    <input className="bg-surface-container border border-outline-variant rounded px-4 py-2 text-sm focus:outline-none focus:border-primary-fixed-dim glow-cyan transition-colors" placeholder="Confirm Password" type="password"/>
-                  </form>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input className="bg-surface-container border border-outline-variant rounded px-4 py-2 text-sm focus:outline-none focus:border-primary-fixed-dim glow-cyan transition-colors" placeholder="Current Password" type="password" value={curPass} onChange={e => setCurPass(e.target.value)} />
+                    <input className="bg-surface-container border border-outline-variant rounded px-4 py-2 text-sm focus:outline-none focus:border-primary-fixed-dim glow-cyan transition-colors" placeholder="New Password" type="password" value={newPass} onChange={e => setNewPass(e.target.value)} />
+                    <input className="bg-surface-container border border-outline-variant rounded px-4 py-2 text-sm focus:outline-none focus:border-primary-fixed-dim glow-cyan transition-colors" placeholder="Confirm Password" type="password" value={confPass} onChange={e => setConfPass(e.target.value)} />
+                  </div>
+                  <button onClick={handleChangePassword} disabled={changingPass || !curPass || !newPass} className="mt-4 px-6 py-2 bg-primary-fixed-dim text-on-primary-fixed font-semibold rounded text-sm hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                    {changingPass ? "Updating..." : "Update Password"}
+                  </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg flex items-center justify-between">
-                    <div>
-                      <p className="font-body-md text-on-surface font-semibold">Two-Factor Authentication</p>
-                      <p className="text-xs text-on-surface-variant">Secure your account with 2FA.</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" defaultChecked />
-                      <div className="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary-fixed-dim"></div>
-                    </label>
+                  <div className="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg">
+                    <Toggle label="Two-Factor Authentication" desc="Secure your account with 2FA." storageKey="pz_2fa" defaultOn />
                   </div>
                   <div className="bg-surface-container-lowest border border-outline-variant p-6 rounded-lg">
                     <p className="font-label-caps text-[11px] text-on-surface-variant mb-4">ACTIVE SESSIONS</p>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="material-symbols-outlined text-sm">laptop_mac</span>
-                          <span className="text-on-surface">MacOS • Chrome (London, UK)</span>
-                        </div>
-                        <span className="text-on-surface-variant">Current</span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
-                          <span className="material-symbols-outlined text-sm">smartphone</span>
-                          <span className="text-on-surface">iPhone 15 • Safari (Paris, FR)</span>
-                        </div>
-                        <button className="text-error hover:underline">Revoke</button>
+                        <div className="flex items-center gap-2"><span className="material-symbols-outlined text-sm">laptop_mac</span><span className="text-on-surface">This Device</span></div>
+                        <span className="text-primary-container font-bold">Current</span>
                       </div>
                     </div>
                   </div>
@@ -208,213 +226,102 @@ export default function SettingsPage() {
               </div>
             </section>
 
-            {/* Section: Editor Preferences */}
+            {/* Editor Preferences */}
             <section id="editor" className="scroll-mt-24">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="h-1 w-8 bg-primary-fixed-dim rounded-full"></div>
-                <h3 className="font-headline-md text-headline-md text-on-surface">Editor Preferences</h3>
-              </div>
+              <div className="flex items-center gap-4 mb-8"><div className="h-1 w-8 bg-primary-fixed-dim rounded-full" /><h3 className="font-headline-md text-headline-md text-on-surface">Editor Preferences</h3></div>
               <div className="bg-surface-container-lowest border border-outline-variant p-8 rounded-lg space-y-10">
                 <div>
                   <p className="font-label-caps text-[11px] text-on-surface-variant mb-4">COLOR THEME</p>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="cursor-pointer border-2 border-primary-fixed-dim bg-background p-2 rounded-lg group">
-                      <div className="h-12 w-full rounded bg-surface-container-high flex flex-col p-1.5 gap-1 mb-2">
-                        <div className="h-1 w-3/4 bg-primary-fixed-dim/40 rounded"></div>
-                        <div className="h-1 w-1/2 bg-on-surface-variant/40 rounded"></div>
+                    {[{id:"dark",label:"DARK (Z-DEFAULT)",bg:"bg-background",inner:"bg-surface-container-high",c1:"bg-primary-fixed-dim/40",c2:"bg-on-surface-variant/40"},{id:"light",label:"LIGHT",bg:"bg-white",inner:"bg-gray-100",c1:"bg-blue-500/40",c2:"bg-gray-400/40"},{id:"monokai",label:"MONOKAI",bg:"bg-[#272822]",inner:"bg-[#3e3d32]",c1:"bg-[#f92672]/40",c2:"bg-[#a6e22e]/40"},{id:"dracula",label:"DRACULA",bg:"bg-[#282a36]",inner:"bg-[#44475a]",c1:"bg-[#bd93f9]/40",c2:"bg-[#50fa7b]/40"}].map(t => (
+                      <div key={t.id} onClick={() => { setSelectedTheme(t.id); localStorage.setItem("pz_theme", t.id); addToast(`Theme set to ${t.label}`, "success"); }} className={`cursor-pointer ${t.bg} p-2 rounded-lg transition-colors ${selectedTheme === t.id ? "border-2 border-primary-fixed-dim" : "border border-outline-variant hover:border-on-surface-variant"}`}>
+                        <div className={`h-12 w-full rounded ${t.inner} flex flex-col p-1.5 gap-1 mb-2`}><div className={`h-1 w-3/4 ${t.c1} rounded`} /><div className={`h-1 w-1/2 ${t.c2} rounded`} /></div>
+                        <p className={`text-[10px] font-bold text-center ${selectedTheme === t.id ? "text-primary-fixed-dim" : "text-on-surface-variant"}`}>{t.label}</p>
                       </div>
-                      <p className="text-[10px] font-bold text-center text-primary-fixed-dim">DARK (Z-DEFAULT)</p>
-                    </div>
-                    <div className="cursor-pointer border border-outline-variant bg-white p-2 rounded-lg hover:border-on-surface-variant transition-colors">
-                      <div className="h-12 w-full rounded bg-gray-100 flex flex-col p-1.5 gap-1 mb-2">
-                        <div className="h-1 w-3/4 bg-blue-500/40 rounded"></div>
-                        <div className="h-1 w-1/2 bg-gray-400/40 rounded"></div>
-                      </div>
-                      <p className="text-[10px] font-bold text-center text-on-surface-variant">LIGHT</p>
-                    </div>
-                    <div className="cursor-pointer border border-outline-variant bg-[#272822] p-2 rounded-lg hover:border-on-surface-variant transition-colors">
-                      <div className="h-12 w-full rounded bg-[#3e3d32] flex flex-col p-1.5 gap-1 mb-2">
-                        <div className="h-1 w-3/4 bg-[#f92672]/40 rounded"></div>
-                        <div className="h-1 w-1/2 bg-[#a6e22e]/40 rounded"></div>
-                      </div>
-                      <p className="text-[10px] font-bold text-center text-on-surface-variant">MONOKAI</p>
-                    </div>
-                    <div className="cursor-pointer border border-outline-variant bg-[#282a36] p-2 rounded-lg hover:border-on-surface-variant transition-colors">
-                      <div className="h-12 w-full rounded bg-[#44475a] flex flex-col p-1.5 gap-1 mb-2">
-                        <div className="h-1 w-3/4 bg-[#bd93f9]/40 rounded"></div>
-                        <div className="h-1 w-1/2 bg-[#50fa7b]/40 rounded"></div>
-                      </div>
-                      <p className="text-[10px] font-bold text-center text-on-surface-variant">DRACULA</p>
-                    </div>
+                    ))}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                   <div className="space-y-6">
                     <div className="space-y-3">
-                      <label className="font-label-caps text-[11px] text-on-surface-variant block">FONT SIZE: 14px</label>
-                      <input className="w-full accent-primary-fixed-dim bg-surface-container h-1 rounded-full appearance-none outline-none" max="24" min="10" type="range" defaultValue="14"/>
-                    </div>
-                    <div className="space-y-3">
-                      <label className="font-label-caps text-[11px] text-on-surface-variant block">FONT FAMILY</label>
-                      <select className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-sm font-code-block outline-none glow-cyan transition-colors">
-                        <option>{"'JetBrains Mono', monospace"}</option>
-                        <option>{"'Fira Code', monospace"}</option>
-                        <option>{"'Source Code Pro', monospace"}</option>
-                      </select>
+                      <label className="font-label-caps text-[11px] text-on-surface-variant block">FONT SIZE: {fontSize}px</label>
+                      <input className="w-full accent-primary-fixed-dim bg-surface-container h-1 rounded-full appearance-none outline-none" max="24" min="10" type="range" value={fontSize} onChange={e => { setFontSize(+e.target.value); localStorage.setItem("pz_fontSize", e.target.value); }} />
                     </div>
                     <div className="space-y-3">
                       <label className="font-label-caps text-[11px] text-on-surface-variant block">TAB SIZE</label>
                       <div className="flex gap-2">
-                        <button className="px-4 py-1.5 border-2 border-primary-fixed-dim bg-primary-container/10 rounded text-xs font-bold text-primary-fixed-dim">2</button>
-                        <button className="px-4 py-1.5 border border-outline-variant rounded text-xs font-bold text-on-surface-variant hover:bg-surface-container-high">4</button>
-                        <button className="px-4 py-1.5 border border-outline-variant rounded text-xs font-bold text-on-surface-variant hover:bg-surface-container-high">8</button>
+                        {[2,4,8].map(s => (
+                          <button key={s} onClick={() => { setTabSize(s); localStorage.setItem("pz_tabSize", String(s)); addToast(`Tab size set to ${s}`, "info"); }} className={`px-4 py-1.5 rounded text-xs font-bold ${tabSize === s ? "border-2 border-primary-fixed-dim bg-primary-container/10 text-primary-fixed-dim" : "border border-outline-variant text-on-surface-variant hover:bg-surface-container-high"}`}>{s}</button>
+                        ))}
                       </div>
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-2">
-                      <span className="font-body-md text-on-surface text-sm">Auto-complete Suggestions</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-9 h-5 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-secondary-fixed-dim after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between p-2 border-t border-outline-variant/30">
-                      <span className="font-body-md text-on-surface text-sm">Line Numbers</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-9 h-5 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-secondary-fixed-dim after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between p-2 border-t border-outline-variant/30">
-                      <span className="font-body-md text-on-surface text-sm">Word Wrap</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" />
-                        <div className="w-9 h-5 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-secondary-fixed-dim after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
-                      </label>
-                    </div>
-                    <div className="flex items-center justify-between p-2 border-t border-outline-variant/30">
-                      <span className="font-body-md text-on-surface text-sm">Vim Mode</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" />
-                        <div className="w-9 h-5 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-secondary-fixed-dim after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
-                      </label>
-                    </div>
+                    <Toggle label="Auto-complete Suggestions" storageKey="pz_autocomplete" defaultOn />
+                    <div className="border-t border-outline-variant/30"><Toggle label="Line Numbers" storageKey="pz_lineNumbers" defaultOn /></div>
+                    <div className="border-t border-outline-variant/30"><Toggle label="Word Wrap" storageKey="pz_wordWrap" /></div>
+                    <div className="border-t border-outline-variant/30"><Toggle label="Vim Mode" storageKey="pz_vimMode" /></div>
                   </div>
                 </div>
               </div>
             </section>
 
-            {/* Section: Notifications */}
+            {/* Notifications */}
             <section id="notifications" className="scroll-mt-24">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="h-1 w-8 bg-tertiary-fixed-dim rounded-full"></div>
-                <h3 className="font-headline-md text-headline-md text-on-surface">Notifications</h3>
-              </div>
+              <div className="flex items-center gap-4 mb-8"><div className="h-1 w-8 bg-tertiary-fixed-dim rounded-full" /><h3 className="font-headline-md text-headline-md text-on-surface">Notifications</h3></div>
               <div className="bg-surface-container-lowest border border-outline-variant rounded-lg divide-y divide-outline-variant">
-                <div className="p-6 flex items-center justify-between">
-                  <div>
-                    <p className="font-body-md text-on-surface font-semibold">Contest Reminders</p>
-                    <p className="text-xs text-on-surface-variant">Get notified 30 minutes before a registered contest starts.</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
-                    <div className="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-secondary-fixed-dim after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                  </label>
-                </div>
-                <div className="p-6 flex items-center justify-between">
-                  <div>
-                    <p className="font-body-md text-on-surface font-semibold">Submission Verdicts</p>
-                    <p className="text-xs text-on-surface-variant">Instant push notifications for your code submission results.</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
-                    <div className="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-secondary-fixed-dim after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                  </label>
-                </div>
-                <div className="p-6 flex items-center justify-between">
-                  <div>
-                    <p className="font-body-md text-on-surface font-semibold">Weekly Digest</p>
-                    <p className="text-xs text-on-surface-variant">A summary of your performance and new editorial releases.</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" />
-                    <div className="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-secondary-fixed-dim after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                  </label>
-                </div>
-                <div className="p-6 flex items-center justify-between">
-                  <div>
-                    <p className="font-body-md text-on-surface font-semibold">New Problem Alerts</p>
-                    <p className="text-xs text-on-surface-variant">Be the first to solve newly added problems in the library.</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
-                    <div className="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-secondary-fixed-dim after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-                  </label>
-                </div>
+                <Toggle label="Contest Reminders" desc="Get notified 30 minutes before a registered contest starts." storageKey="pz_notif_contest" defaultOn />
+                <Toggle label="Submission Verdicts" desc="Instant push notifications for your code submission results." storageKey="pz_notif_verdict" defaultOn />
+                <Toggle label="Weekly Digest" desc="A summary of your performance and new editorial releases." storageKey="pz_notif_digest" />
+                <Toggle label="New Problem Alerts" desc="Be the first to solve newly added problems in the library." storageKey="pz_notif_problems" defaultOn />
               </div>
             </section>
 
-            {/* Section: Appearance */}
+            {/* Appearance */}
             <section id="appearance" className="scroll-mt-24">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="h-1 w-8 bg-primary-fixed-dim rounded-full"></div>
-                <h3 className="font-headline-md text-headline-md text-on-surface">Appearance</h3>
-              </div>
+              <div className="flex items-center gap-4 mb-8"><div className="h-1 w-8 bg-primary-fixed-dim rounded-full" /><h3 className="font-headline-md text-headline-md text-on-surface">Appearance</h3></div>
               <div className="bg-surface-container-lowest border border-outline-variant p-8 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-12">
                 <div className="space-y-6">
                   <div className="space-y-3">
                     <label className="font-label-caps text-[11px] text-on-surface-variant block">APPLICATION THEME</label>
                     <div className="flex bg-surface-container p-1 rounded border border-outline-variant">
-                      <button className="flex-1 py-2 text-xs font-bold rounded-sm bg-background border border-outline-variant text-primary-fixed-dim">DARK</button>
-                      <button className="flex-1 py-2 text-xs font-bold text-on-surface-variant hover:text-on-surface">LIGHT</button>
-                      <button className="flex-1 py-2 text-xs font-bold text-on-surface-variant hover:text-on-surface">SYSTEM</button>
+                      {["DARK","LIGHT","SYSTEM"].map(t => (
+                        <button key={t} onClick={() => addToast(`Theme: ${t} mode applied`, "success")} className={`flex-1 py-2 text-xs font-bold ${t === "DARK" ? "rounded-sm bg-background border border-outline-variant text-primary-fixed-dim" : "text-on-surface-variant hover:text-on-surface"}`}>{t}</button>
+                      ))}
                     </div>
                   </div>
                   <div className="space-y-3">
                     <label className="font-label-caps text-[11px] text-on-surface-variant block">UI LANGUAGE</label>
-                    <select className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-sm focus:outline-none glow-cyan transition-colors outline-none">
-                      <option>English (United States)</option>
-                      <option>Simplified Chinese</option>
-                      <option>Russian</option>
-                      <option>Spanish</option>
+                    <select onChange={() => addToast("Language preference saved", "success")} className="w-full bg-surface-container border border-outline-variant rounded px-4 py-2 text-sm focus:outline-none glow-cyan transition-colors outline-none">
+                      {["English (United States)","Simplified Chinese","Russian","Spanish"].map(l => <option key={l}>{l}</option>)}
                     </select>
                   </div>
                 </div>
                 <div className="space-y-3">
                   <label className="font-label-caps text-[11px] text-on-surface-variant block">ACCENT COLOR</label>
                   <div className="flex flex-wrap gap-4">
-                    <button className="w-10 h-10 rounded-full bg-[#00dbe7] border-2 border-white shadow-[0_0_10px_rgba(0,219,231,0.5)]"></button>
-                    <button className="w-10 h-10 rounded-full bg-[#bd93f9] border border-outline-variant"></button>
-                    <button className="w-10 h-10 rounded-full bg-[#2ae500] border border-outline-variant"></button>
-                    <button className="w-10 h-10 rounded-full bg-[#ff9e0b] border border-outline-variant"></button>
+                    {["#00dbe7","#bd93f9","#2ae500","#ff9e0b"].map(c => (
+                      <button key={c} onClick={() => { setAccentColor(c); addToast("Accent color updated", "success"); }} className="w-10 h-10 rounded-full" style={{ background: c, border: accentColor === c ? "2px solid white" : "1px solid var(--color-outline-variant)", boxShadow: accentColor === c ? `0 0 10px ${c}80` : "none" }} />
+                    ))}
                   </div>
-                  <p className="text-xs text-on-surface-variant mt-4">Selected: Cyan (System Default)</p>
+                  <p className="text-xs text-on-surface-variant mt-4">Selected: {accentColor === "#00dbe7" ? "Cyan (Default)" : accentColor}</p>
                 </div>
               </div>
             </section>
 
-            {/* Section: Danger Zone */}
+            {/* Danger Zone */}
             <section id="danger" className="scroll-mt-24">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="h-1 w-8 bg-error rounded-full"></div>
-                <h3 className="font-headline-md text-headline-md text-error">Danger Zone</h3>
-              </div>
+              <div className="flex items-center gap-4 mb-8"><div className="h-1 w-8 bg-error rounded-full" /><h3 className="font-headline-md text-headline-md text-error">Danger Zone</h3></div>
               <div className="bg-error-container/5 border border-error/30 p-8 rounded-lg">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                   <div className="flex-1">
                     <h4 className="font-body-md text-on-surface font-bold text-lg mb-2">Delete Account</h4>
-                    <p className="text-sm text-on-surface-variant max-w-lg">
-                      Permanently delete your account and all associated data including problem history, submission logs, and contest points. This action cannot be undone.
-                    </p>
+                    <p className="text-sm text-on-surface-variant max-w-lg">Permanently delete your account and all associated data including problem history, submission logs, and contest points. This action cannot be undone.</p>
                   </div>
-                  <button className="px-6 py-2.5 border border-error text-error hover:bg-error hover:text-on-error font-bold rounded transition-all whitespace-nowrap">
-                    Delete Account
-                  </button>
+                  <button onClick={() => setShowDeleteModal(true)} className="px-6 py-2.5 border border-error text-error hover:bg-error hover:text-on-error font-bold rounded transition-all whitespace-nowrap">Delete Account</button>
                 </div>
               </div>
             </section>
-
           </div>
         </main>
       </div>

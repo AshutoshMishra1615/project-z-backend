@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
+import { ToastProvider } from "./context/ToastContext";
 import Navbar from "./components/Navbar";
+import ToastContainer from "./components/Toast";
 
 export const metadata: Metadata = {
   title: "Project Z — Elite Developer Terminal",
@@ -21,9 +23,12 @@ export default function RootLayout({
       </head>
       <body className="flex flex-col h-screen font-body-md text-body-md selection:bg-primary-container/30 overflow-hidden bg-background">
         <AuthProvider>
-          <div className="bg-grid" />
-          <Navbar />
-          <main className="flex-1 flex overflow-hidden relative z-10 w-full">{children}</main>
+          <ToastProvider>
+            <div className="bg-grid" />
+            <Navbar />
+            <main className="flex-1 flex overflow-hidden relative z-10 w-full">{children}</main>
+            <ToastContainer />
+          </ToastProvider>
         </AuthProvider>
       </body>
     </html>
